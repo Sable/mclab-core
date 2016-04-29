@@ -1,0 +1,40 @@
+
+ "kdpee", k-d partitioning entropy estimator.
+ (c) 2008-2009 Dan Stowell and Queen Mary University of London.
+ All rights reserved.
+
+This package contains the entropy estimator described in 
+
+    D. Stowell and M. D. Plumbley
+    Fast multidimensional entropy estimation by k-d partitioning.
+    IEEE Signal Processing Letters 16 (6), 537--540, June 2009.
+    http://dx.doi.org/10.1109/LSP.2009.2017346
+
+The estimator is written in C and so should be easily usable in any C/C++
+software, as well as in other languages that can call upon C.
+
+This package also contains wrappers which allow the code to be used from
+Matlab, GNU Octave, or Python (numpy).
+
+
+INSTALLATION:
+
+For installation instructions, please see the file named INSTALL.
+
+
+CONTENTS:
+
+The folders in this package contain:
+
+ * src     - the kdpee source code
+ * kdpee   - the kdpee header file
+ * mat_oct - the wrapper for matlab / gnu octave
+ * python  - the wrapper for python (numpy)
+
+
+LICENSE:
+
+This package is distributed under the terms of the GNU General Public 
+License, version 3 or (at your option) any later version. For the text
+of the license please see the file named COPYING.
+

@@ -1,0 +1,16 @@
+
+Version 1.1.1, 2011-07-20
+=========================
+* Better compatibility of 'mexme' across GCC versions - thanks to Anh Cat Le Ngo
+
+Version 1.1, 2009-05-19
+=======================
+* add python (numpy) bindings
+* rearrange file structure of package more cleanly (gnu coding standards style)
+
+
+Version 1.0
+===========
+* kdpee C code, with matlab/octave bindings
+
+

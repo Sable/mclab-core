@@ -1,0 +1,321 @@
+v0.62 (Apr. 17, 2016):
+-Von Mises expansion based estimators have been included for 7 unconditional quantities: Shannon entropy ('HShannon_vME_initialization.m', 'HShannon_vME_estimation.m'), Shannon mutual information 'IShannon_vME_initialization.m', 'IShannon_vME_estimation.m'), Kullback-Leibler divergence ('DKL_vME_initialization.m', 'DKL_vME_estimation.m'), Renyi divergence ('DRenyi_vME_initialization.m', 'DRenyi_vME_estimation.m'), Tsallis divergence ('DTsallis_vME_initialization.m', 'DTsallis_vME_estimation.m'), Pearson Chi^2 divergence ('DChiSquare_vME_initialization.m', 'DChiSquare_vME_estimation.m') and Hellinger distance ('DHellinger_vME_initialization.m', 'DHellinger_vME_estimation.m').
+-Analytical value: added for the Hellinger distance ('analytical_value_DHellinger.m').
+-quick tests: updated according to the new techniques ('quick_test_HShannon.m', 'quick_test_IShannon.m', 'quick_test_DKL.m', 'quick_test_DRenyi.m', 'quick_test_DTsallis.m', 'quick_test_DChiSquare.m', 'quick_test_DHellinger.m').
+-'ITE_install.m': ARfit url updated (http -> https).
+
+v0.61 (Feb. 8, 2015):
+-Explicit additive constant computation has been included in the generalized kNN based Renyi entropy estimators; see 'HRenyi_kNN_1tok_estimation.m', 'HRenyi_kNN_S_estimation.m', 'compute_constS.m', 'estimate_HRenyi_constant.m'; thanks to Dougal Sutherland for the improvement suggestion; documentation: updated accordingly.
+-'analytical_value_KEJR2.m' reduced to 'analytical_value_DJensen_Renyi.m'.
+-Copyright: "2012-2014" -> "2012-".
+
+v0.60 (June 2, 2014):
+-Quick test on the Tsallis divergence: introduced; see 'quick_test_DTsallis.m'.
+-Pearson chi square divergence estimation in the exponential family (MLE + analytical formula): added; see 'DChiSquare_expF_initialization.m', 'DChiSquare_expF_estimation.m'. 
+-Quick tests, computation of the log-normalizer and its gradient: updated with the new estimator; see 'quick_test_DChiSquare.m', 'quick_test_Dequality.m', 'expF_F.m', 'expF_gradF.m'.
+-MERR: verification of the existence of the AOD (aerosol optical depth prediction) generated dataset: added to 'generate_AOD_dataset.m'.
+-Typo: discovered in 'DMMD_Ustat_estimation.m'; 'd' stood instead of 'num_of_samplesY1'/'num_of_samplesY2' while making the diagonal of 'kY1Y1'/'kY2Y2' to be zero. Thanks to Rainer Kargel for noticing it; typo: corrected.
+-Note: strange activity on the 17-18^th May (20k downloads).
+
+v0.59 (May 16, 2014):
+-Adaptive partitioning based Shannon mutual information estimators: added; see (i) 'IShannon_AD2_initialization.m', IShannon_AD2_estimation.m, 'IShannon_AD_initialization.m', 'IShannon_AD_estimation.m', and (ii) 'shared/embedded/AP_MI' -- thanks to Petr Tichavsky and Zbynek Koldovsky for providing the implementations.
+-'ITE_install.m', 'quick_test_IShannon.m', 'quick_test_Iimreg.m', 'quick_test_Iindependence.m': updated accordingly.
+
+v0.58 (Apr. 29, 2014):
+-3-way interaction indices based on the embedding of the (i) Lancaster interaction and (ii) 'joint - product of the marginals' signed measures to a RKHS (reproducing kernel Hilbert space): added; see 'I3way_Lancaster_initialization.m', 'I3way_Lancaster_estimation.m', 'I3way_joint_initialization.m', 'I3way_joint_estimation.m'. Both functions support median heuristic for RBF bandwidth choice, see 'median_heuristic.m'.
+-Quick tests: updated to cover the new estimators, see 'quick_test_Iindependence.m'.
+-Note: there was a version typo in the _title_ of 'ITE-0.57_documentation.pdf' (0.56 was in the title); corrected.
+
+v0.57 (Apr. 10, 2014):
+-A new sampling based entropy estimator with KDE (kernel density estimation) correction on the left/right sides: added; see 'HShannon_spacing_VKDE_initialization.m', 'HShannon_spacing_VKDE_estimation.m'. 
+-Kullback-Leibler divergence estimation based on maximum likelihood estimation + analytical formula in the chosen exponential family: added; see 'DKL_expF_initialization.m' and 'DKL_expF_estimation.m'.
+-Quick tests: updated with the new estimators, see 'quick_test_HShannon.m', 'quick_test_DKL.m', 'quick_test_Dequality.m'.
+
+v0.56 (Mar. 27, 2014):
+-Distribution regression (supervised entropy learning, aerosol optical depth prediction based on satellite images): added; see the new directory 'tests_distribution_regression' in the 'quick_tests' folder.
+-MMD distance computation based on U-statistics, expected kernel: upgraded to cover new kernels (exponential, Cauchy, Matern, polynomial, rational quadratic, inverse multiquadratic), see 'DMMD_Ustat_initialization.m', 'DMMD_Ustat_estimation.m', 'Kexpected_initialization.m', 'Kexpected_estimation.m'.
+-New references: added; see 'Kexpected_estimation.m', 'DMMD_online_estimation.m', ' DMMD_Ustat_estimation.m', 'DMMD_Ustat_iChol_estimation.m', 'DMMD_Vstat_estimation.m', 'DMMD_Vstat_iChol_estimation.m', 'IHSIC_estimation.m'.
+-Quick tests: grouped; see the new 'tests_analytical_vs_estimation', 'tests_other_consistency' and 'tests_image_registration' directories in the 'quick_tests' folder.
+
+v0.55 (Mar. 7, 2014):
+-Shannon entropy and cross-entropy estimation based on maximum likelihood estimation + analytical formula in the chosen exponential family: added; see 'HShannon_expF_initialization.m', 'HShannon_expF_estimation.m', 'CCE_expF_initialization', 'CCE_expF_estimation.m'.
+-Quick tests: updated with the new estimators, see 'quick_test_HShannon.m', 'quick_test_Himreg.m' and 'quick_test_CCE.m'.
+-Citing information (JMLR page numbers): updated in the documentation.
+
+v0.54 (Feb. 24, 2014):
+-Renyi entropy estimation based on maximum likelihood estimation + analytical formula in the exponential family: added; see 'HRenyi_expF_initialization.m', 'HRenyi_expF_estimation.m'.
+-Tsallis entropy estimation based on MLE + analytical formula in the exponential family: added; see 'HTsallis_expF_initialization.m', 'HRenyi_Tsallis_estimation.m'.
+-Quick tests: updated according to the new estimators; see 'quick_test_HRenyi.m', 'quick_test_HTsallis.m', 'quick_test_Himreg.m'.
+
+v0.53 (Feb. 2, 2014):
+-f-divergence estimation based on second-order Taylor expansion + Pearson chi square divergence: added; see 'Df_DChiSquare_initialization.m', 'Df_DChiSquare_estimation.m'.
+-Shannon mutual information estimation based on KL divergence: added; see 'IShannon_DKL_initialization.m', 'IShannon_DKL_estimation.m'. 
+-Quick tests updated with the new estimators; see 'quick_test_IShannon.m', 'quick_test_Iimreg.m', 'quick_test_Iindependence.m', 'quick_test_Dequality.m'.
+-ARfit download: updated to the new 'http://clidyn.ethz.ch/arfit/arfit.zip' url, see 'ITE_install.m'.
+
+v0.52 (Jan. 9, 2014):
+-Sharma-Mittal divergence estimation: 
+i)added using (i) maximum likelihood + analytical formula in the exponential family, (ii) k-nearest neighbors; see 'DSharmaM_expF_initialization.m', 'DSharmaM_expF_estimation.m', 'DSharmaM_kNN_k_initialization.m', 'DSharmaM_kNN_k_estimation.m'. 
+ii)quick test: added, see 'quick_test_DSharmaM.m'.
+-Shannon mutual information quick test: added; see 'quick_test_IShannon.m' and 'analytical_value_IShannon.m'. 
+-Normal variables: 
+i)added to the Pearson chi square divergence quick test, see 'quick_test_DChiSquare.m' and 'analytical_value_DChiSquare.m'.
+ii)mean and covariance parameter fields unified to 'par.mean', 'par.cov'.
+-Copyright info: updated to '2012-2014'.
+
+v0.51 (Dec. 29, 2013):
+
+Refactorization, documentation upgrade:
+==============================
+-ITE has been accepted for publication in JMLR. Citing information: added to the documentation.
+-Copyright: changed to '2012-2013' from '2013'.
+-co.mult=0 (1) means 'exact' estimation (estimation up to 'proportionality') explanation: added (see code + doc).
+-Default kNN estimator: set to 'ANN'; see 'CCE_kNN_k_initialization.m', 'DBhattacharyya_kNN_k_initialization.m', 'DBregman_kNN_k_initialization.m', 'DChiSquare_kNN_k_initialization.m', 'DHellinger_kNN_k_initialization.m', 'DKL_kNN_k_initialization.m', 'DKL_kNN_kiTi_initialization.m', 'DL2_kNN_k_initialization.m', 'DRenyi_kNN_k_initialization.m', 'DsymBregman_kNN_k_initialization.m', 'DTsallis_kNN_k_initialization.m', 'HRenyi_kNN_1tok_initialization.m', 'HRenyi_kNN_k_initialization.m', 'HRenyi_kNN_S_initialization.m', 'HRenyi_weightedkNN_initialization.m', 'HShannon_kNN_k_initialization.m', 'HSharmaM_kNN_k_initialization.m', 'HTsallis_kNN_k_initialization.m', 'KBhattacharyya_kNN_k_initialization.m', 'KPP_kNN_k_initialization.m'. => faster quick tests (larger sample number,...).
+-embedded NCut package: 'eigs_new.m' deleted (license issues) and the computation is reduced to the built-in 'eigs.m' function.
+-'code/estimators/utilities/lena512.mat': removed; it was included 2x.
+-If k is 'extreme large' in kNN based estimator, then gamma(k) [or the product of such quantities] is Inf. A solution for such cases is now included using the gammaln function, see 'estimate_Ialpha.m', 'estimate_Dtemp1.m', 'estimate_Dtemp2.m', 'estimate_Dtemp3.m'. The case was noticed (with solution principle) by Nikolaus Schweizer - thank you.
+-'MMD_Ustat' <-> 'MMD_Vstat', 'MMD_Ustat_iChol' <-> 'MMD_Vstat_iChol': naming typo corrected.
+
+New:
+====
+-Block-MMD (maximum mean discrepancy) estimator: added; see 'DBMMD_DMMD_Ustat_initialization.m' and 'DBMMD_DMMD_Ustat_estimation.m'. Quick test 'quick_test_Dequality.m' has been modified accordingly.
+
+v0.50 (Dec. 18, 2013):
+-Entropy and Kullback-Leibler divergence estimation based on power spectral density representation and Szego's theorem: added; see 'HShannon_PSD_SzegoT_initialization.m', 'HShannon_PSD_SzegoT_estimation.m', 'DKL_PSD_SzegoT_initialization.m', 'DKL_PSD_SzegoT_estimation.m'. Quick tests modified accordingly, see 'quick_test_HShannon.m', 'quick_test_DKL.m', 'quick_test_Dequality.m'.
+-Different noisy examples added to the image registration quick test; see 'quick_test_Himreg.m', 'quick_test_Iimreg.m', 'add_image_noise.m'.
+
+v0.49 (Dec. 1, 2013):
+
+New:
+====
+-MMD (maximum mean discrepancy) estimation based on U- and V-statistics: incomplete Cholesky decomposition based accelerations added; see 'DMMD_Ustat_iChol_initialization.m', 'DMMD_Ustat_iChol_estimation.m', 'DMMD_Vstat_iChol_initialization.m', 'DMMD_Vstat_iChol_estimation.m'. 'quick_test_Dequality.m': updated with the new estimators.
+
+Refactorization, documentation upgrade:
+=======================================
+-Analytical values in the quick tests: relocated to separate files; see the 'analytical_values' directory.
+-Documentation: 
+--Hyperrefs: activated to improve navigation in the doc; direct jumps to the definitions of the information theoretical quantities: added in Table 3-12 (first columns) and in Fig. 1.
+--Fig. 1: the "I_{dCov} <- I_{HSIC}" and the "I{\chi^2} <- D_{\chi^2}" arrows pointed in the opposite direction; typo corrected.
+--The embedded NCut package has a new homepage, documentation updated accordingly.
+
+v0.48 (Nov. 11, 2013):
+-Sharma-Mittal entropy estimation based on (i) k-nearest neighbors (S={k}), and (ii) maximum likehood estimation (MLE) + analytical value in the exponential family: added; see 'HSharmaM_kNN_k_initialization.m', 'HSharmaM_kNN_k_estimation.m', 'HSharmaM_expF_initialization.m', 'HSharmaM_expF_estimation.m'.
+-Quick test for the Sharma-Mittal entropy estimators: added; see 'quick_test_HSharmaM.m'.
+-Analytical value for the Sharma-Mittal entropy, MLE, log-normalizer in the exponential family: separately implemented to make the estimation highly modular; see 'analytical_value_HSharmaM.m', 'expF_MLE.m', 'expF_F.m'. 
+
+v0.47 (Nov. 1, 2013):
+-Chi-square mutual information estimation based on Pearson chi-square divergence: added; see 'IChiSquare_DChiSquare_initialization', 'IChiSquare_DChiSquare_estimation.m'.
+-Shannon entropy estimation based on an alternative linearly corrected spacing method: added; see 'HShannon_spacing_Vplin2_initialization.m', 'HShannon_spacing_Vplin2_estimation.m'.
+-Quick tests updated with the new estimators, see 'quick_test_HShannon.m', 'quick_test_Iimreg.m', 'quick_test_Iindependence.m'.
+
+v0.46 (Oct. 21, 2013):
+-Phi-entropy (f-entropy) estimation based on the spacing method: added; see 'HPhi_spacing_initialization.m', 'HPhi_spacing_estimation.m'.
+-Pearson chi square divergence (chi square distance) estimation based on k-nearest neighbors: added; see 'DChiSquare_kNN_k_initialization.m', 'DChiSquare_kNN_k_estimation.m'.
+-Quick test for Phi-entropy and Pearson chi square divergence: introduced; see 'quick_test_HPhi.m', 'quick_test_DChiSquare.m'.
+-Quick test 'quick_test_Dequality.m': updated to cover Pearson chi square divergence.
+
+v0.45 (Oct. 9, 2013):
+-Exponentiated Jensen-Tsallis kernel estimators based on Tsallis entropy and Jensen-Tsallis divergence: added; see 'KEJT1_HT_initialization.m', 'KEJT1_HT_estimation.m', 'KEJT2_DJT_initialization.m', 'KEJT2_DJT_estimation.m'.
+-Quick tests for the exponentiated Jensen-Tsallis kernel estimators: added, see 'quick_test_EJT1.m', 'quick_test_KEJT2.m'. 'quick_test_Kpos_semidef.m': changed to cover the 2 new distribution kernel estimators.
+
+v0.44 (Oct. 1, 2013):
+-Exponentiated Jensen-Renyi kernel estimators based on Renyi entropy and Jensen-Renyi divergence: added; see 'KEJR1_HR_initialization.m', 'KEJR1_HR_estimation.m', 'KEJR2_DJR_initialization.m', 'KEJR2_DJR_estimation.m'.
+-Quick tests for the exponentiated Jensen-Renyi kernel estimators: added, see 'quick_test_EJR1.m', 'quick_test_KEJR2.m'. 'quick_test_Kpos_semidef.m': changed to cover the 2 new distribution kernel estimators.
+
+v0.43 (Sept. 20, 2013):
+-Exponentiated Jensen-Shannon kernel estimation: added; see 'KEJS_DJS_initialization.m', 'KEJS_DJS_estimation.m'.
+-Jensen-Tsallis kernel estimation: added; see 'KJT_HJT_initialization.m', 'KJT_HJT_estimation.m'.
+-'quick_test_Kpos_semidef.m': changed to cover the 2 new distribution kernel estimators.
+-URL of the embedded FastKICA package: updated to its new location.
+
+v0.42 (Sept. 7, 2013):
+
+New:
+====
+-Initialization and estimation of high-level information theoretical estimators (H/I/D/A/C/K): 'eval' changed to 'function handles' to speed up computations; see '<X>_initialization.m' and '<X>_estimation.m', where <X>='H'/'I'/'D'/'A'/'C'/'K'.
+-Cost object initialization now allows setting field values (alpha, number of kNN-s, ...) through its argument. This makes ITE more user-friendly. It also enables overriding default values and is useful in meta estimators for parameter inheritence. See 'post_initialization.m'; '<X>_initialization.m' and '<X><cost_name>_initialization.m', where <X>='H'/'I'/'D'/'A'/'C'/'K'. For the usage in meta estimators, see
+'HTsallis_HRenyi_initialization.m', 'IRenyi_DRenyi_initialization.m', 'ITsallis_DTsallis_initialization.m', 'IRenyi_HRenyi_initialization.m', 'DJensenRenyi_HRenyi_initialization.m', 'DJensenTsallis_HTsallis_initialization.m', 'DsymBregman_DBregman_initialization.m', 'KJS_DJS_initialization.m'. For further details, see doc: Section 3.3.2.
+-Quick tests introduced: consistency of the estimators, positive semi-definiteness of Gram matrices determined by distribution kernels, image registration; see directory 'quick_tests', doc: Section 5, Section F.
+
+Refactorization; documentation improved:
+==============================
+-Function names added to the first line of the code descriptions to improve help.
+-Copyright information: detached from help (one empty line inserted before license information).
+-Homepage, email address: updated.
+-Importance of co.mult: explained in more detail (doc + code (see 'co.mult:OK...')).
+-co.alpha: changed to be the same in all Renyi/Tsallis estimators, co.alpha = 0.99 -- uniformity. 
+-Typo discovered and corrected: 'HShannon_DKL_N_estimation.m': 'Y_normal = ... + m' -> 'Y_normal = ... + repmat(m,1,num_of_samples)' (typo for d>1).
+-Directory 'H_I_D_A_C_K' renamed to 'estimators'. 'ITE_install.m': updated accordingly.
+-Comment on the relation between mutual information and total correlation (or multi-information): added [doc + code (see 'IShannon_HShannon_initialization.m')].
+-To ease the usage of ITE 'ITE_add_to_path.m' and 'ITE_remove_from_path.m': added. These functions make it possible to add/remove the ITE code directory to/from the Matlab/Octave PATH.
+-Explicit instructions for the installation of the toolbox added to 'ITE_install.m' when no compilation is carried out.
+-'HRPensemble_estimation.m': verification that 'RP dimension <= dimension of the samples' added.
+-'mexme.m' (=compilation of KDP): an alternative compilation option added.
+-In pathological cases (quite small dimension and large number of samples) the estimated Renyi additive constant (see 'estimate_HRenyi_constant.m') can be Inf. This case is now handled by introducing 'replace_Infs_with_max.m', see 'compute_length_HRenyi_kNN_1tok.m', 'compute_length_HRenyi_kNN_S.m'.
+- 'MatlabBGL' and the associated GSF based Renyi entropy estimator ('HRenyi_GSF_initialization.m', HRenyi_GSF_estimation.m', 'compute_length_HRenyi_GSF.m'): deleted (self-containedness improved + space considerations); 'compute_MST.m','HRenyi_MST_initialization.m', 'HRenyi_MST_estimation.m': modified accordingly.
+-The embedded 'sqdistance.m' (squared Euclidean distance computation) function could give some small, but negative values in the diagonal of 'sqdistance(Y)'; corrected. 
+-'Guideance' on the choice of the estimators: included, see doc: Section 3.4.
+-Figure listing all the estimators and their relations: added, see doc: Section 3.3.2: Fig. 1.
+-Note on compiler requirements: added (see doc).
+-ITE_install.m: made to be more user-friendly; detection of the already (i) deleted 'ann_wrapperO'/'ann_wrapperM' directory, (ii) downloaded ARfit package: added.
+
+v0.41 (July 12, 2013):
+-Probability product kernel estimation based on k-nearest neighbors: added; see 'KPP_kNN_k_initialization.m' and 'KPP_kNN_k_estimation.m'.
+-Jensen-Shannon kernel estimation: added; see 'KJS_DJS_initialization.m' and 'KJS_DJS_estimation.m'.
+
+v0.40 (Jun. 23, 2013):
+-Bhattacharyya kernel estimation based on k-nearest neighbors: added; see 'KBhattacharyya_kNN_k_initialization.m' and 'KBhattacharyya_kNN_k_estimation.m'.
+-Expected kernel estimation: added; see 'Kexpected_initialization.m', 'Kexpected_estimation.m'.
+-Directory 'H_I_D_A_C' renamed to 'H_I_D_A_C_K'; 'ITE_install.m' modified accordingly.
+-Kernel on distributions (K) object type: added; see 'K_initialization.m', 'K_estimation.m'. 
+
+v0.39 (Jun. 12, 2013):
+-Symmetric Bregman distance estimation based on nonsymmetric Bregman distance: added; see 'DsymBregman_DBregman_initialization.m', 'DsymBregman_DBregman_estimation.m'.
+-Symmetric Bregman distance estimation based on k-nearest neighbors: added; see 'DsymBregman_kNN_k_initialization.m', 'DsymBregman_kNN_k_estimation.m'. 
+
+v0.38 (Jun. 1, 2013):
+-Jensen-Tsallis divergence estimation: added; see 'DJensenTsallis_HTsallis_initialization.m' and 'DJensenTsallis_HTsallis_estimation.m'.
+-Bregman distance estimation: added; see 'DBregman_kNN_k_initialization.m' and 'DBregman_kNN_k_estimation.m'.
+
+v0.37 (May 12, 2013):
+-K divergence estimation: added; see 'DK_DKL_initialization.m' and 'DK_DKL_estimation.m'.
+-L divergence estimation: added; see 'DL_DKL_initialization.m' and 'DL_DKL_estimation.m'.
+-Handling 'Y==Q' in case of co.kNNmethod = 'knnsearch': included; see 'kNN_squared_distances.m'.
+-Dimension verification: added to 
+(i) meta estimators, see 'ITsallis_DTsallis_estimation.m', 'DEnergyDist_DMMD_estimation.m', 'DJdistance_estimation.m', 'DJensenRenyi_HRenyi_estimation.m', 'DJensenShannon_HShannon_estimation.m', 'DKL_CCE_HShannon_estimation.m'.
+(ii) utilities 'estimate_Dtemp1.m' and 'estimate_Dtemp2.m'.
+
+v0.36 (Apr. 26, 2013):
+-Jensen-Renyi divergence estimation: added; see 'DJensenRenyi_HRenyi_initialization.m' and 'DJensenRenyi_HRenyi_estimation.m'.
+-Jensen-Shannon divergence estimation: added; see 'DJensenShannon_HShannon_initialization.m' and 'DJensenShannon_HShannon_estimation.m'.
+
+v0.35 (Apr. 1, 2013):
+-An alternative Jacobi optimization based ICA solution with general entropy/mutual information estimators: added; see 'estimate_ICA.m', 'estimate_ICA_Jacobi2.m'. The method is using a different fining scheme in the rotation angle search compared to 'estimate_ICA_Jacobi1.m'.
+
+v0.34 (Mar. 22, 2013):
+-Jacobi optimization based ICA solution with general entropy/mutual information estimators: added; see 'estimate_ICA.m', 'estimate_ICA_Jacobi1.m'.
+
+v0.33 (Mar. 6, 2013):
+-Two one-dimensional Shannon entropy estimators based on the maximum entropy method: added; see 'HShannon_MaxEnt1_initialization.m', 'HShannon_MaxEnt1_estimation.m', 'HShannon_MaxEnt2_initialization.m', 'HShannon_MaxEnt2_estimation.m'.
+
+v0.32 (Feb. 25, 2013):
+-ICA and ISA structures: introduced for unified treatment of the estimators. It will also enable embedding of general ICA optimization algorithms such as the Jacobi method. 
+-Some variables: renamed; see ARmethod_parameters -> AR, ARXmethod_parameters -> ARX, fARmethod_parameters -> fAR, MAparameters -> MA, gaussianizationmethod_parameters -> gaussianization.
+-'estimate_mAR.m': 'stepwiseLS' method deleted.
+-Example 20 (ISA-3): cost_type = 'KGV' typo corrected (-> cost_type = 'Ipairwise1d'; doc).
+-'kdpee.c': MSVC does not provide log2. A more elegant solution: added.
+
+v0.31 (Feb. 9, 2013):
+-EASI (equivariant adaptive separation via independence) real/complex ICA method: added; see 'estimate_ICA_EASI.m', 'estimate_ICA.m', 'estimate_complex_ICA.m'.
+-Adaptive (k-d) partitioning based Shannon entropy estimation: added; see 'HShannon_KDP_initialization.m', 'HShannon_KDP_estimation.m'.
+
+v0.30 (Jan. 25, 2013):
+-Upper tail dependence via conditional Spearman's rho: added; see 'ASpearman_U_initialization.m', 'ASpearman_U_estimation.m'.
+-Multivariate conditional version of Spearman's rho weighting the lower tail: added; see 'ASpearman_ut_initialization.m', 'ASpearman_ut_estimation.m'.
+
+v0.29 (Jan. 13, 2013):
+-Lower tail dependence via conditional Spearman's rho: added; see 'ASpearman_L_initialization.m', 'ASpearman_L_estimation.m'.
+-Multivariate conditional version of Spearman's rho weighting the lower tail: added; see 'ASpearman_lt_initialization.m', 'ASpearman_lt_estimation.m'.
+-Notes on lower- and upper orthant dependence: added (doc: see 'Spearman1' and 'Spearman2').
+
+v0.28 (Jan. 2, 2013):
+-Multivariate extension of Blomqvist's beta (medial correlation coefficient): added; see 'ABlomqvist_initialization.m', 'ABlomqvist_estimation.m'.
+-Average pairwise Spearman's rho: added; see 'ASpearman4_initialization.m', 'ASpearman4_estimation.m'.
+-Definition of the multivariate measure of concordance and -independence measure: added (doc).
+-Further references: included; see 'ISW1_estimation.m', 'ISWinf_estimation.m', 'ASpearman1_estimation.m', 'ASpearman2_estimation.m', 'ASpearman3_estimation.m', +doc.
+
+v0.27 (Dec. 28, 2012):
+-Approximate correntropy independence measure estimator: added; see 'IApprCorrEntr_initialization.m', 'IApprCorrEntr_estimation.m'.
+-Correntropy induced metric, centered correntropy induced metric estimators: added; see 'ACIM_initialization.m', 'ACIM_estimation.m', 'ACCIM_initialization.m', 'ACCIM_estimation.m'.
+-Correntropy, centered correntropy, correntropy coefficient estimators: added; see 'ACorrEntr_KDE_direct_initialization.m', 'ACorrEntr_KDE_direct_estimation.m', 'ACCorrEntr_KDE_iChol_initialization.m', 'ACCorrEntr_KDE_iChol_estimation.m', 'ACCorrEntr_KDE_Lapl_initialization.m', 'ACCorrEntr_KDE_Lapl_estimation.m', 'ACorrEntrCoeff_KDE_direct_initialization.m', 'ACorrEntrCoeff_KDE_direct_estimation.m', 'ACorrEntrCoeff_KDE_iChol_initialization.m', 'ACorrEntrCoeff_KDE_iChol_estimation.m'.
+-Some references fine-tuned/added (code+doc).
+-Handling of identically constant random variables in distance correlation computation: included; see 'IdCor_estimation.m'.
+
+v0.26 (Dec. 22, 2012):
+-Distance covariance estimation via HSIC: added; see IdCov_IHSIC_initialization.m', 'IdCov_IHSIC_estimation.m'.
+-Energy distance estimation via MMD: added; see 'DEnergyDist_DMMD_initialization.m', 'DEnergyDist_DMMD_estimation'.
+-Energy distance estimation: added; see 'DEnergyDist_initialization.m', 'DEnergyDist_estimation.m'.
+-We computed the square of distance correlation: sqrt added, see 'IdCor_estimation.m'.
+-The ARfit website is again available: 'ITE_install.m' changed to its original form.
+
+v0.25 (Dec. 15, 2012):
+-Distance covariance, distance correlation estimation: added; see 'IdCov_initialization.m', 'IdCov_estimation.m', 'IdCor_initialization.m', 'IdCor_estimation.m'.
+-Temporarily the homepage of the downloaded ARfit website seems to be unavailable. Download link changed to 'http://www.mathworks.com/matlabcentral/fileexchange/174-arfit?download=true'; see 'ITE_install.m'.
+
+v0.24 (Dec. 12, 2012):
+-MMD estimation based on U- and V-statistics: added; see 'DMMD_Ustat_initialization.m', 'DMMD_Ustat_estimation.m', 'DMMD_Vstat_initialization.m', 'DMMD_Vstat_estimation.m'.
+-Notes on HSIC, MMD and measures of concordance: added (doc).
+-Online MMD estimation: now RBF and linear kernels are both available; see 'DMMD_online_initialization.m', 'DMMD_online_estimation.m'.
+-'MMDonline' renamed to 'MMD_online'; see 'DMMD_online_initialization.m', 'DMMD_online_estimation.m'; 'IMMD_DMMD_initialization.m': modified accordingly.
+
+v0.23 (Dec. 7, 2012):
+-Three multivariate extensions of Spearman's rho: added; see 'ASpearman1_initialization.m', 'ASpearman1_estimation.m', 'ASpearman2_initialization.m', 'ASpearman2_estimation.m', 'ASpearman3_initialization.m', 'ASpearman3_estimation.m'.
+-Association (A) cost object type: added; see 'A_initialization.m', 'A_estimation.m'. 
+-Directory 'H_I_D_C' renamed to 'H_I_D_A_C'; 'ITE_install.m' modified accordingly.
+-Verification of the H/I/D/C function arguments: unified across different estimators. Further verification (compatibility of ds and Y): added to I-estimators (the estimations have not changed). Some comment unification: carried out. 
+
+v0.22 (Dec. 1, 2012):
+-Cauchy-Schwartz and Euclidean distance based divergence estimators: added; see 'DCS_KDE_iChol_initialization.m', 'DCS_KDE_iChol_estimation.m', 'DED_KDE_iChol_initialization.m', 'DED_KDE_iChol_estimation.m'.
+-Cauchy-Schwartz and Euclidean distance based quadratic mutual information estimators: added; see 'IQMI_CS_KDE_direct_initialization.m', 'IQMI_CS_KDE_direct_estimation.m', 'IQMI_CS_KDE_iChol_initialization.m', 'IQMI_CS_KDE_iChol_estimation.m', 'IQMI_ED_KDE_iChol_initialization.m', 'IQMI_ED_KDE_iChol_estimation.m'.
+
+v0.21 (Nov. 25, 2012):
+-Kullback-Leibler divergence meta estimator based on cross-entropy and entropy: added; see 'DKL_CCE_HShannon_initialization.m', 'DKL_CCE_HShannon_estimation.m'.
+-Cross-entropy estimation based on k-nearest neighbors: added; see 'CCE_kNN_k_initialization.m', 'CCE_kNN_k_estimation.m'.
+-Cross (C) cost object type: added; see 'C_initialization.m', 'C_estimation.m'. 
+-Directory 'H_I_D' renamed to 'H_I_D_C'; 'ITE_install.m' modified accordingly.
+-IGV_estimation: added (#2); documentation: modified accordingly.
+
+v0.20 (Nov. 19, 2012):
+-Two Shannon entropy estimators based on the distance (KL divergence) from the uniform/Gaussian distributions: added; see 'HShannon_DShannon_U_initialization.m', 'HShannon_DShannon_U_estimation.m', 'HShannon_DShannon_N_initialization.m', 'HShannon_DShannon_N_estimation.m'.
+-Shannon entropy estimator based on Voronoi regions: added; see 'HShannon_Voronoi_initialization.m', 'HShannon_Voronoi_estimation.m'.
+-The documentation of the ITE package has been banished to 'https://bitbucket.org/szzoli/ite/downloads': Downloads. (Its history unnecessarily increased the size of the Mercurial repository.) For further details, see 'doc:ITE_documentation.txt'.
+-some code refactoring: (i) divergence estimators: notation (X,Y) -> (Y1,Y2); (ii) disp('Error:...')/disp('Warning:...') -> error('...')/warning('...'); (iii) 'Renyi_CDSS' renamed to 'qRenyi_CDSS'.
+
+v0.19 (Nov. 16, 2012):
+-2 k-nearest neighbor based Kullback-Leibler divergence estimators: added. See 'DKL_kNN_k_initialization.m', 'DKL_kNN_k_estimation.m', 'DKL_kNN_kiTi_initialization.m', 'DKL_kNN_kiTi_estimation.m'.
+-compute_CDSS.cpp: 'sqrt(T)' -> 'sqrt(double(T))', to increase compatibility with compilers.
+-Note on Jensen-Shannon divergence: deleted (doc).
+
+v0.18 (Nov. 10, 2012):
+-8 sample spacing based 1d Shannon/Rényi entropy estimators: added; see 'HShannon_spacing_V_initialization.m', 'HShannon_spacing_V_estimation.m', 'HShannon_spacing_Vb_initialization.m', 'HShannon_spacing_Vb_estimation.m', 'HShannon_spacing_Vpconst_initialization.m', 'HShannon_spacing_Vpconst_estimation.m', 'HShannon_spacing_Vplin_initialization.m', 'HShannon_spacing_Vplin_estimation.m', 'HShannon_spacing_LL_initialization.m', 'HShannon_spacing_LL_estimation.m', 'HRenyi_spacing_V_initialization.m', 'HRenyi_spacing_V_estimation.m', 'HRenyi_spacing_E_initialization.m', 'HRenyi_spacing_E_estimation.m', 'HRenyi_CDSS_initialization.m', 'HRenyi_CDSS_estimation.m'.
+-minimum spanning tree, geodesic spanning forest: reference updated (doc+comments); For the latter, see 'HRenyi_MST_estimation', 'HRenyi_GSF_estimation.m'.
+-A note on a built-in helping automatism of meta estimators: added (comments); see 'HTsallis_HRenyi_initialization.m', 'IRenyi_DRenyi_initialization.m', 'IRenyi_HRenyi_initialization.m', 'ITsallis_DTsallis_initialization.m'.
+-some 'co.mul=mult' -> 'co.mult=mult' typo corrected (to be precise, the computations were OK); see 'ITsallis_DTsallis_initialization.m', 'IShannon_HShannon_initialization.m', 'IRenyi_HRenyi_initialization.m', 'IRenyi_DRenyi_initialization.m', 'IL2_DL2_initialization.m', 'Icomplex_initialization.m', 'HRPensemble_initialization.m', 'Hensemble_initialization.m', 'Hcomplex_initialization.m'.
+
+v0.17 (Nov. 6, 2012):
+-Edgeworth expansion based Shannon entropy estimator: accelerated (C++ alternative); see 'Edgeworth_t1_t2_t3.cpp'.
+-'Tsallis entropy <- Renyi entropy' meta estimator: added; see 'HTsallis_HRenyi_initialization.m', 'HTsallis_HRenyi_estimation.m'. 
+
+v0.16 (Nov. 2, 2012):
+-Edgeworth expansion based Shannon entropy estimator: added; see 'HShannon_Edgeworth_initialization.m', 'HShannon_Edgeworth_estimation.m'.
+-Lookup table for the underlying H/I/D estimation formulas: added (see ITE_documentation.pdf: Section C).
+-estimate_HRenyi_constant.m: simplified; gam: deleted.
+
+v0.15 (Oct. 29, 2012):
+-The Hellinger and Bhattacharyya distances are now available in ITE. They can be estimated via k-nearest neighbor methods; see 'DHellinger_kNN_k_initialization.m', 'DHellinger_kNN_k_estimation.m', 'DBhattacharyya_kNN_k_initialization.m', and 'DBhattacharyya_kNN_k_estimation.m'.
+-volume_of_the_unit_ball.m: added. 
+-DL2_kNN_k_estimation.m: a '/'->'*' typo corrected (c: volume of the unit ball).
+
+v0.14 (Oct. 29, 2012):
+-Monte-Carlo simulation to compute the additive constants in Renyi entropy estimation: added; see 'estimate_HRenyi_constant.m'.
+-compute_length_HRenyi_MST.m: pdist -> sqdistance (acceleration).
+-The embedded 'knnFP1' method can produce an '1e-15' rounding error in squared_distances => W is not _perfectly_ sym. (in the verification of compute_MST.m:kruskal_mst.m), correction made; see 'compute_length_HRenyi_GSF.m'.
+-kNN_squared_distances.m, co.kNNmethod='knnFP2': for compatibility reasons variable 'indices' has been converted to int32.
+
+v0.13 (Oct. 27, 2012):
+-Tsallis entropy is now available in ITE; it can be estimated via k-nearest neighbors, see 'HTsallis_kNN_k_initialization.m', 'HTsallis_kNN_k_estimation.m'.
+-A '/'->'*' typo corrected in 'HRenyi_kNN_k_estimation.m'; see 'estimate_Ialpha.m' (V: volume of the unit ball).
+
+v0.12 (Oct. 27, 2012):
+-Schweizer-Wolff's sigma and kappa: added; see 'ISW1_initialization.m', 'ISW1_estimation.m', 'ISWinf_initialization.m', 'ISWinf_estimation.m'.
+-Hoeffding's Phi computation: scaled-up (C++ alternative); see 'Hoeffding_term1.cpp'.
+-HRenyi_weightedkNN_initialization.m: contained a superfluous co.k parameter, deleted.
+-chol_gauss.c: a superfluous 'double *y' variable deleted.
+-dY==dX (dimension of Y and X) verification added to 'DRenyi_kNN_k_estimation.m', 'DTsallis_kNN_k_estimation.m', 'DL2_kNN_k_estimation.m'.
+-some comments improved.
+
+v0.11 (Oct. 20, 2012):
+-multivariate version of the Hoeffding's Phi estimator: added (see 'IHoeffding_initialization.m', 'IHoeffding_estimation.m').
+-ITE_install.m: updated to perform only the 'compiled' quick tests. I am a greedy user;) See #1.
+
+v0.1 (Oct. 10, 2012): initial release.

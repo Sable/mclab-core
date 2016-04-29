@@ -1,0 +1,24 @@
+SWICA (Schweizer-Wolff contrast for Independent Component Analysis) algorithm is implemented mostly in Matlab with some subroutines using Mex/C++.  Mex/C++ routines are also duplicated in Matlab code, but I STRONGLY suggest compiling C++ files and using the binaries instead.
+
+List of files:
+SWICA_solve.m -- envelop routine for running the software;
+
+SW_contrast.m -- envelop routine for computing SW measure of dependence, the contrast used in SWICA;
+
+SW_sigma.m    -- computation of SW sigma measure of dependence using empirical copulas;
+SW_sigma.cpp
+
+SW_kappa.m    -- computation of SW kappa measure of dependence using empirical copulas;
+SW_kappa.cpp
+
+SW_demo.m     -- a simple example of how to use SWICA
+
+
+SWICA is distributed under BSD license.  See file LICENSE for details.
+
+If you use the software, please use the following citation:
+Sergey Kirshner, Barnabas Poczos, "ICA and ISA Using Schweizer-Wolff Measure of Dependence," Proceedings of the Twenty Fifth Conference on Machine Learning, 2008.
+
+
+Sergey Kirshner (sergey@cs.ualberta.ca)
+May 7, 2008

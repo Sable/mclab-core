@@ -1,0 +1,6 @@
+From v0.20, the documentation of a given release is available at 'https://bitbucket.org/szzoli/ite/downloads': Downloads tab: 'ITE-<release>_documentation.pdf'.
+Note: the contents of the .zip and .tar.bz2-ed codes are identical.
+
+
+
+
