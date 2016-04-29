@@ -627,6 +627,7 @@ prefix_postfix_expr :
 
 postfix_expr :
      primary_expr (FILLER? (ARRAYTRANSPOSE | MTRANSPOSE))*
+  |  primary_expr FILLER? (INCR | DECR)
   ;
 
 primary_expr :
@@ -699,6 +700,26 @@ postfix_arg :
      primary_arg (FILLER? (ARRAYTRANSPOSE | MTRANSPOSE))*
   ;
 
+/*arg :
+     arg (FILLER? SHORTOR FILLER? arg)*
+  |  arg (FILLER? SHORTAND FILLER? arg)*
+  |  arg (FILLER? OR FILLER? arg)*
+  |  arg (FILLER? AND FILLER? arg)*
+  |  arg (FILLER? (LT | GT | LE | GE | EQ | NE) FILLER? arg)*
+  |  arg (FILLER? COLON FILLER? arg (FILLER? COLON FILLER? arg)?)?
+  |  arg (FILLER? (PLUS | MINUS) FILLER? arg)*
+  |  arg (FILLER? (MTIMES | ETIMES | MDIV | EDIV | MLDIV | ELDIV) FILLER? arg)*
+  |  arg
+       |  t_NOT FILLER? arg
+       |  (PLUS | MINUS) FILLER? arg //NB: plus_arg may break if this is written as two rules
+  |  arg (FILLER? (MPOW | EPOW) FILLER? arg)*
+  |  arg
+       |  (t_NOT | PLUS | MINUS) FILLER? arg
+  |  primary_arg (FILLER? (ARRAYTRANSPOSE | MTRANSPOSE))*
+  |  AT FILLER? input_params FILLER? arg
+  |  COLON
+  ;*/
+
 primary_arg :
      literal
   |  LPAREN FILLER? arg FILLER? RPAREN
@@ -718,7 +739,7 @@ paren_access :
   ;
 
 cell_access :
-     name (FILLER? LCURLY FILLER? arg_list FILLER? RCURLY)*
+     name (FILLER? LCURLY FILLER? arg_list FILLER? RCURLY)* //FUNCTION CALL
   |  {!(inSquare() || inCurly())}? name FILLER? AT FILLER? name
   |  {inSquare() || inCurly()}? name AT name //TODO-AC: fix error message for name AT FILLER name case
   ;
@@ -802,7 +823,8 @@ expr_or_tilde :
 element_separator_list :
      FILLER? COMMA FILLER? #ECHO //just echo
   //|  {isElementSeparator()}? { offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); } FILLER -> template(filler={$text}) ",<filler>" //insert comma
-  |  {isElementSeparator()}? /*{ offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); }*/ FILLER #COMMA_INSERT2
+  //|  {isElementSeparator()}? /*{ offsetTracker.recordOffsetChange(0, -1); offsetTracker.advanceInLine(1); }*/ FILLER #COMMA_INSERT2
+  | FILLER #nocomma
   //TODO VSD
   ;
 

@@ -1,11 +1,16 @@
+import org.antlr.v4.misc.Graph;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-/**
- * Created by valerie on 08/03/16.
- */
+
 public class OctaveListenerWalk extends OctaveBaseListener {
+    int tempCounter;
+    public String getTemp(){
+        tempCounter++;
+        return "temp"+tempCounter;
+    }
     @Override
     public void enterQuiet_element_separator_list(OctaveParser.Quiet_element_separator_listContext ctx) {
         java.util.List<TerminalNode> e = ctx.getTokens(1);
@@ -25,7 +30,8 @@ public class OctaveListenerWalk extends OctaveBaseListener {
     }
     @Override
     public void enterName(OctaveParser.NameContext ctx) {
-        //System.out.print(ctx.getText());
+        System.out.print("_"+ctx.getText());
+
     }
 
     public void enterMaybe_cmd(OctaveParser.Maybe_cmdContext ctx) {
@@ -54,6 +60,12 @@ public class OctaveListenerWalk extends OctaveBaseListener {
        //if(ctx.getClass().equals(compare.getClass()));
            //System.out.print("{"+ctx.getText()+"}");
    }
+    @Override
+    public void enterPostfix_expr(OctaveParser.Postfix_exprContext ctx) {
+        //find type (only want second rule)
+        //save lefthand (var)
+        //use lefthand to do expression expansion. (based on token type)
+    }
 
     @Override
     public void visitTerminal(TerminalNode node) {
@@ -82,6 +94,21 @@ public class OctaveListenerWalk extends OctaveBaseListener {
                 break;
             case -1: //<EOF>
                 System.out.println();
+                break;
+            /*case 79://++
+                System.out.print("=");
+                ParseTree parent = node.getParent();
+                while(parent.getChildCount() == 1){
+                    parent = parent.getParent();
+                }
+                System.out.print("+1");
+                break;
+            case 80: //--
+                System.out.print("=");
+
+                System.out.print("-1");
+                break;*/
+            case 43: //IDENTIFIER - need to underscore all user-given ids
                 break;
             default:
                 System.out.print(node.getText()); //get the text of the token
