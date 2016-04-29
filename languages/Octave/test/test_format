@@ -1,0 +1,8 @@
+for FILE in $(find benchmarks/*/ -name '*.m' | sort)
+do
+	echo -n $FILE
+	echo -n ": "
+	octave --no-gui $FILE
+	echo
+	# echo "-----------------------------"
+done
