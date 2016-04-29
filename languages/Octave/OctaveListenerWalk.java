@@ -36,7 +36,6 @@ public class OctaveListenerWalk extends OctaveBaseListener {
 
     public void enterMaybe_cmd(OctaveParser.Maybe_cmdContext ctx) {
         //java.util.List<TerminalNode> e = ctx.getTokens(4);
-
        // System.out.print('=');
     }
    /* @Override
