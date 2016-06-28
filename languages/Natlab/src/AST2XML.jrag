@@ -16,6 +16,14 @@ Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill Universit
 
 */
 
+/*
+
+Copyright 2016 Samuel Suffos
+
+This file was modified to deal with the AST modifications introduced in file "natlab.ast".
+
+*/
+
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Map;
@@ -155,20 +163,29 @@ aspect ASTtoXML {
     addChildrenXml(doc, e, getNestedFunctions());
   }
 
+  // CHANGED
   public void ClassDef.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, Iterables.concat(
         getAttributes(), getSuperClasss(), getHelpComments(),
-        getPropertys(), getMethods(), getClassEvents()),
+        getPropertys(), getMethods(), getClassEvents(), getEnumerations()),
         "name", getName());
+  }
+
+  // NEW
+  public void Enumerations.getXML(Document doc, Element parent)
+  {
+    createXmlElement(doc, parent, Iterables.concat(getAttributes(), getEnumerations()));
   }
 
   public void Properties.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, Iterables.concat(getAttributes(), getPropertys()));
   }
 
-  public void Methods.getXML(Document doc, Element parent) {
+  // CHANGED
+  public void Methods.getXML(Document doc, Element parent)
+  {
     createXmlElement(doc, parent, Iterables.concat(
-        getAttributes(), getSignatures(), getPropAccs(), getFunctions()));
+        getAttributes(), getSignatures(), getPropAccs(), getFunctions(), getPropAccSigs()));
   }
 
   public void Signature.getXML(Document doc, Element parent) {
@@ -186,6 +203,13 @@ aspect ASTtoXML {
     addChildrenXml(doc, e, getNestedFunctions());
   }
 
+  // NEW
+  public void PropertyAccessSignature.getXML(Document doc, Element parent) {
+      Element e = createXmlElement(doc, parent, "name", getName(), "access", getAccess());
+      addChildrenXml(doc, e, "InputParamList", getInputParams());
+      addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+    }
+
   public void ClassEvents.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, Iterables.concat(getAttributes(), getEvents()));
   }
@@ -196,6 +220,12 @@ aspect ASTtoXML {
 
   public void SuperClass.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, "name", getName());
+  }
+
+  // NEW
+  public void Enumeration.getXML(Document doc, Element parent)
+  {
+      createXmlElement(doc, parent, getExprs(), "name", getName());
   }
 
   public void Property.getXML(Document doc, Element parent) {
@@ -256,10 +286,16 @@ aspect ASTtoXML {
         "outputSuppressed", String.valueOf(isOutputSuppressed()));
   }
 
+  // CHANGED
   public void ForStmt.getXML(Document doc, Element parent) {
     Element e = createXmlElement(doc, parent, Arrays.asList(getAssignStmt()),
         "is_parfor", String.valueOf(isParfor()));
     addChildrenXml(doc, e, "StmtList", getStmts());
+
+    if (hasWorker())
+    {
+        getWorker().getXML(doc, e);
+    }
   }
 
   public void WhileStmt.getXML(Document doc, Element parent) {
@@ -302,20 +338,32 @@ aspect ASTtoXML {
     addChildrenXml(doc, e, "StmtList", getStmts());
   }
 
-  public void TryStmt.getXML(Document doc, Element parent) {
+  // CHANGED
+  public void TryStmt.getXML(Document doc, Element parent)
+  {
     Element e = createXmlElement(doc, parent);
     addChildrenXml(doc, e, "StmtList", getTryStmts());
     if (getCatchStmts().getNumChild() > 0) {
       addChildrenXml(doc, e, "StmtList", getCatchStmts());
     }
+
+    if (hasCatchName())
+    {
+      getCatchName().getXML(doc, e);
+    }
   }
 
+  // CHANGED
   public void RangeExpr.getXML(Document doc, Element parent) {
+
+    Element e = null;
     if (hasIncr()) {
-      createXmlElement(doc, parent, Arrays.asList(getLower(), getIncr(), getUpper()));
+      e = createXmlElement(doc, parent, Arrays.asList(getLower(), getIncr(), getUpper()));
     } else {
-      createXmlElement(doc, parent, Arrays.asList(getLower(), getUpper()));
+      e = createXmlElement(doc, parent, Arrays.asList(getLower(), getUpper()));
     }
+
+    addChildrenXml(doc, e, "Others", getOthers());
   }
 
   public void ColonExpr.getXML(Document doc, Element parent) {
@@ -410,4 +458,194 @@ aspect ASTtoXML {
   public void BinaryExpr.getXML(Document doc, Element parent) {
     createXmlElement(doc, parent, Arrays.asList(getLHS(), getRHS()));
   }
+
+  // NEW
+  public void SpmdStmt.getXML(Document doc, Element parent)
+  {
+    Element e = createXmlElement(doc, parent, Arrays.asList());
+
+    if (hasMinWorker())
+    {
+      getMinWorker().getXML(doc, e);
+    }
+
+    if (hasMaxWorker())
+    {
+      getMaxWorker().getXML(doc, e);
+    }
+
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  // ASPECTS ========================================================================
+
+    public void AspectDef.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Iterables.concat(
+                getHelpComments(),
+                getPropertys(), getMethods(), getClassEvents(), getEnumerations(), getPatterns(), getActions()),
+                "name", getName());
+    }
+
+    public void Actions.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, getActions());
+    }
+
+    public void Patterns.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, getPatterns());
+    }
+
+    public void Action.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, "name", getName(), "type", getType());       
+        addChildrenXml(doc, e, "InputParamList", getInputParams());
+        addChildrenXml(doc, e, "Pattern", Iterables.concat(getExpr()));
+        addChildrenXml(doc, e, "StmtList", getStmts());
+        addChildrenXml(doc, e, getNestedFunctions());
+    }
+
+    public void Pattern.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, "name", getName());
+        addChildrenXml(doc, e, Arrays.asList(getExpr()));
+    }
+
+    public void Selector.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, getElements());
+    }
+
+    public void TypeSignature.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, getType());
+    }
+
+    public void DimensionSignature.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, getDimensions());
+    }
+
+    public void FullSignature.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent);
+
+        if (hasTypeSignature())
+        {
+           getTypeSignature().getXML(doc, e);
+        }
+
+        if (hasDimensionSignature())
+        { 
+          getDimensionSignature().getXML(doc, e);
+        }
+    }
+
+    public void Input.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Iterables.concat(getFullSignatures()));
+    }
+
+    public void Output.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Iterables.concat(getFullSignatures()));
+    }
+
+    public void PatternName.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Arrays.asList(getName()));
+    }
+
+    public void PatternGet.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+
+        if (hasFullSignature())
+        { 
+          getFullSignature().getXML(doc, e);
+        }
+    }
+
+    public void PatternSet.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+
+        if (hasFullSignature())
+        { 
+          getFullSignature().getXML(doc, e);
+        }
+    }
+
+    public void PatternCall.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Arrays.asList(getIdentifier(), getInput(), getOutput()));
+    }
+
+    public void PatternExecution.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent, Arrays.asList(getIdentifier(), getInput(), getOutput()));
+    }
+
+    public void PatternMainExecution.getXML(Document doc, Element parent)
+    {
+        createXmlElement(doc, parent);
+    }
+
+    public void PatternLoop.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+
+        if (hasType())
+        {
+          getType().getXML(doc, e);
+        }        
+    }
+
+    public void PatternLoopHead.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+
+        if (hasType())
+        {
+          getType().getXML(doc, e);
+        }   
+    }
+
+    public void PatternLoopBody.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+
+        if (hasType())
+        {
+          getType().getXML(doc, e);
+        }   
+    }
+
+    public void PatternAnnotate.getXML(Document doc, Element parent)
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getIdentifier()));
+        addChildrenXml(doc, e, getSelectors());
+    }
+
+    public void PatternOperator.getXML(Document doc, Element parent) 
+    {
+        Element e = createXmlElement(doc, parent, Arrays.asList(getType()));
+        addChildrenXml(doc, e, getFullSignatures());
+    }
+
+    public void PatternWithin.getXML(Document doc, Element parent) 
+    {
+        createXmlElement(doc, parent, Arrays.asList(getType(), getIdentifier()));
+    }
+
+    public void PatternDimension.getXML(Document doc, Element parent) 
+    {
+        createXmlElement(doc, parent, Arrays.asList(getDimensionSignature()));
+    }
+
+    public void PatternIsType.getXML(Document doc, Element parent) 
+    {
+        createXmlElement(doc, parent, Arrays.asList(getTypeSignature()));
+    }
 }

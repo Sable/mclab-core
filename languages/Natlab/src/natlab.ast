@@ -1,6 +1,6 @@
 // =========================================================================== //
 //                                                                             //
-// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                  //
 //   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
 //   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
 //   Laurie Hendren, Clark Verbrugge and McGill University.                    //
@@ -19,116 +19,269 @@
 //                                                                             //
 // =========================================================================== //
 
+// =========================================================================== //
+//                                                                             //
+//   Also copyright 2016 Samuel Suffos.                                        //
+//   This file includes additions and changes by Samuel Suffos.                //
+//   Modifications are backwards compatible.                                   //
+//                                                                             //
+// =========================================================================== //
+
 // AST for Natlab grammar
-CompilationUnits ::= Program*;
-abstract Program;
-Script : Program ::= HelpComment* Stmt*;
-FunctionList : Program ::= Function*;
 
-abstract Body;
-abstract ClassBody : Body;
-abstract FunctionOrSignatureOrPropertyAccessOrStmt;
+CompilationUnits ::= Program* ;
 
-ClassDef : Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents*;
-Attribute ::= <Key:String> Expr;
-SuperClass ::= <Name:String>;
-Properties:ClassBody ::= Attribute* Property*;
-Property ::= <Name:String> Expr;
-Methods:ClassBody ::= Attribute* Signature* PropAcc:PropertyAccess* Function*;
-Signature : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name*;
-PropertyAccess : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
-ClassEvents:ClassBody ::= Attribute* Event*;
-Event ::= <Name:String>;
+// ------------------------------------------------------------------------------
 
-Function : FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* Name:Name InputParam:Name* HelpComment* Stmt* NestedFunction:Function*;
+abstract Program ;
 
-abstract HelpComment ::= <Text:String>;
-OneLineHelpComment : HelpComment;
-MultiLineHelpComment : HelpComment;
+Script:Program ::= HelpComment* Stmt* ;
 
-Name ::= <ID : String>;
+FunctionList:Program ::= Function* ;
 
-abstract Stmt : FunctionOrSignatureOrPropertyAccessOrStmt;
-ExprStmt : Stmt ::= Expr;
-AssignStmt : Stmt ::= LHS:Expr RHS:Expr;
-GlobalStmt : Stmt ::= Name*;
-PersistentStmt : Stmt ::= Name*;
-ShellCommandStmt : Stmt ::= <Command : String>;
+// ------------------------------------------------------------------------------
 
-BreakStmt : Stmt;
-ContinueStmt : Stmt;
-ReturnStmt : Stmt;
+abstract FunctionOrSignatureOrPropertyAccessOrStmt ;
 
-EmptyStmt : Stmt; //TODO-AC: remove this
+Function:FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* Name:Name InputParam:Name* HelpComment* Stmt* NestedFunction:Function* ;
 
-ForStmt : Stmt ::= AssignStmt Stmt* <isParfor : boolean>;
-WhileStmt : Stmt ::= Expr Stmt*;
+// ------------------------------------------------------------------------------
 
-TryStmt : Stmt ::= TryStmt:Stmt* CatchStmt:Stmt*;
+ClassDef:Program ::= Attribute* <Name:String> SuperClass* HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents* Enumeration:Enumerations* ; // CHANGED
 
-SwitchStmt : Stmt ::= Expr SwitchCaseBlock* [DefaultCaseBlock];
-SwitchCaseBlock ::= Expr Stmt*;
-DefaultCaseBlock ::= Stmt*;
+Attribute ::= <Key:String> Expr ;
 
-IfStmt : Stmt ::= IfBlock* [ElseBlock];
-IfBlock ::= Condition:Expr Stmt*;
-ElseBlock ::= Stmt*;
+SuperClass ::= <Name:String> ;
 
-abstract Expr;
-RangeExpr : Expr ::= Lower:Expr [Incr:Expr] Upper:Expr;
-ColonExpr : Expr;
-EndExpr : Expr;
+abstract Body ;
 
-abstract LValueExpr : Expr;
-NameExpr : LValueExpr ::= Name;
-ParameterizedExpr : LValueExpr ::= Target:Expr Arg:Expr*;
-CellIndexExpr : LValueExpr ::= Target:Expr Arg:Expr*;
-DotExpr : LValueExpr ::= Target:Expr Field:Name;
-MatrixExpr : LValueExpr ::= Row*;
+abstract ClassBody:Body ;
 
-CellArrayExpr : Expr ::= Row*;
-SuperClassMethodExpr : Expr ::= FuncName:Name ClassName:Name;
+Properties:ClassBody ::= Attribute* Property* ;
 
-Row ::= Element:Expr*;
+Methods:ClassBody ::= Attribute* Signature* PropAcc:PropertyAccess* Function* PropAccSig:PropertyAccessSignature* ; // CHANGED
+
+ClassEvents:ClassBody ::= Attribute* Event* ;
+
+Enumerations:ClassBody ::= Attribute* Enumeration* ; // NEW
+
+Property ::= <Name:String> Expr ;
+
+Signature:FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Name:String> InputParam:Name* ;
+
+PropertyAccess:FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* HelpComment* Stmt* NestedFunction:Function* ;
+
+PropertyAccessSignature:FunctionOrSignatureOrPropertyAccessOrStmt ::= OutputParam:Name* <Access:String> <Name:String> InputParam:Name* ; // NEW
+
+Event ::= <Name:String> ;
+
+Enumeration ::= <Name:String> Expr* ; // NEW
+
+// ------------------------------------------------------------------------------
+
+abstract Stmt:FunctionOrSignatureOrPropertyAccessOrStmt ;
+
+ExprStmt:Stmt ::= Expr ;
+
+AssignStmt:Stmt ::= LHS:Expr RHS:Expr ;
+
+GlobalStmt:Stmt ::= Name* ;
+
+PersistentStmt:Stmt ::= Name* ;
+
+ShellCommandStmt:Stmt ::= <Command:String> ;
+
+BreakStmt:Stmt ;
+
+ContinueStmt:Stmt ;
+
+ReturnStmt:Stmt ;
+
+EmptyStmt:Stmt ; //TODO-AC: remove this
+
+ForStmt:Stmt ::= AssignStmt Stmt* <isParfor : boolean> [Worker:Expr] ; // CHANGED
+
+WhileStmt:Stmt ::= Expr Stmt* ;
+
+TryStmt:Stmt ::= TryStmt:Stmt* CatchStmt:Stmt* [CatchName:Name] ; // CHANGED
+
+SwitchStmt:Stmt ::= Expr SwitchCaseBlock* [DefaultCaseBlock] ;
+SwitchCaseBlock ::= Expr Stmt* ;
+DefaultCaseBlock ::= Stmt* ;
+
+IfStmt:Stmt ::= IfBlock* [ElseBlock] ;
+IfBlock ::= Condition:Expr Stmt* ;
+ElseBlock ::= Stmt* ;
+
+SpmdStmt:Stmt ::= [MinWorker:Expr] [MaxWorker:Expr] Stmt* ; // NEW
+
+// ------------------------------------------------------------------------------
+
+abstract Expr ;
+
+// ------------------------------
+
+abstract LValueExpr:Expr ;
+
+NameExpr:LValueExpr ::= Name ;
+
+ParameterizedExpr:LValueExpr ::= Target:Expr Arg:Expr* ;
+
+CellIndexExpr:LValueExpr ::= Target:Expr Arg:Expr* ;
+
+DotExpr:LValueExpr ::= Target:Expr Field:Name ;
+
+MatrixExpr:LValueExpr ::= Row* ;
+Row ::= Element:Expr* ;
+
+// ------------------------------
 
 abstract LiteralExpr : Expr;
-IntLiteralExpr : LiteralExpr ::= <Value:natlab.IntNumericLiteralValue>;
-FPLiteralExpr : LiteralExpr ::= <Value:natlab.FPNumericLiteralValue>;
+
+IntLiteralExpr : LiteralExpr ::= <Value:natlab.IntNumericLiteralValue> ;
+
+FPLiteralExpr : LiteralExpr ::= <Value:natlab.FPNumericLiteralValue> ;
+
 StringLiteralExpr : LiteralExpr ::= <Value:String>;
 
-abstract UnaryExpr : Expr ::= Operand:Expr;
-UMinusExpr : UnaryExpr;
-UPlusExpr : UnaryExpr;
-NotExpr : UnaryExpr;
-MTransposeExpr : UnaryExpr;
-ArrayTransposeExpr : UnaryExpr;
+// ------------------------------
 
-abstract BinaryExpr : Expr ::= LHS:Expr RHS:Expr;
-PlusExpr : BinaryExpr;
-MinusExpr : BinaryExpr;
+abstract UnaryExpr:Expr ::= Operand:Expr ;
 
-MTimesExpr : BinaryExpr;
-MDivExpr : BinaryExpr;
-MLDivExpr : BinaryExpr;
-MPowExpr : BinaryExpr;
+UMinusExpr:UnaryExpr ;
 
-ETimesExpr : BinaryExpr;
-EDivExpr : BinaryExpr;
-ELDivExpr : BinaryExpr;
-EPowExpr : BinaryExpr;
+UPlusExpr:UnaryExpr ;
 
-AndExpr : BinaryExpr;
-OrExpr : BinaryExpr;
+NotExpr:UnaryExpr ;
 
-ShortCircuitAndExpr : BinaryExpr;
-ShortCircuitOrExpr : BinaryExpr;
+MTransposeExpr:UnaryExpr ;
 
-LTExpr : BinaryExpr;
-GTExpr : BinaryExpr;
-LEExpr : BinaryExpr;
-GEExpr : BinaryExpr;
-EQExpr : BinaryExpr;
-NEExpr : BinaryExpr;
+ArrayTransposeExpr:UnaryExpr ;
 
-FunctionHandleExpr : Expr ::= Name;
-LambdaExpr : Expr ::= InputParam:Name* Body:Expr;
+// ------------------------------
+
+abstract BinaryExpr:Expr ::= LHS:Expr RHS:Expr ;
+
+PlusExpr:BinaryExpr ;
+
+MinusExpr:BinaryExpr ;
+
+MTimesExpr:BinaryExpr ;
+
+MDivExpr:BinaryExpr ;
+
+MLDivExpr:BinaryExpr ;
+
+MPowExpr:BinaryExpr ;
+
+ETimesExpr:BinaryExpr ;
+
+EDivExpr:BinaryExpr ;
+
+ELDivExpr:BinaryExpr ;
+
+EPowExpr:BinaryExpr ;
+
+AndExpr:BinaryExpr ;
+
+OrExpr:BinaryExpr ;
+
+ShortCircuitAndExpr:BinaryExpr ;
+
+ShortCircuitOrExpr:BinaryExpr ;
+
+LTExpr:BinaryExpr ;
+
+GTExpr:BinaryExpr ;
+
+LEExpr:BinaryExpr ;
+
+GEExpr:BinaryExpr ;
+
+EQExpr:BinaryExpr ;
+
+NEExpr:BinaryExpr ;
+
+// ------------------------------
+
+RangeExpr:Expr ::= Lower:Expr [Incr:Expr] Upper:Expr Other:Expr* ; // CHANGED
+ 
+ColonExpr:Expr ;
+
+EndExpr:Expr ;
+
+FunctionHandleExpr:Expr ::= Name ;
+
+LambdaExpr:Expr ::= InputParam:Name* Body:Expr ;
+
+CellArrayExpr:Expr ::= Row* ;
+
+SuperClassMethodExpr:Expr ::= FuncName:Name ClassName:Name ;
+
+// ------------------------------------------------------------------------------
+
+abstract HelpComment ::= <Text:String> ;
+
+OneLineHelpComment:HelpComment ;
+
+MultiLineHelpComment:HelpComment ;
+
+Name ::= <ID:String> ;
+
+
+
+// ASPECT =======================================================================
+
+
+AspectDef:Program ::= <Name:String> HelpComment* Property:Properties* Method:Methods* ClassEvent:ClassEvents* Enumeration:Enumerations* Pattern:Patterns* Action:Actions* ;
+
+Patterns:ClassBody ::= Pattern* ;
+
+Actions:ClassBody ::= Action* ;
+
+Action ::= <Name:String> <Type:String> Expr InputParam:Name* Stmt* NestedFunction:Function* ;
+
+Pattern ::= <Name:String> Expr ;
+
+abstract BaseSignature ;
+
+TypeSignature:BaseSignature ::= Type:Name ;
+
+DimensionSignature:BaseSignature ::= Dimension:Name* ;
+
+FullSignature:BaseSignature ::= [TypeSignature] [DimensionSignature] ;
+
+PatternName:Expr ::= Name ;
+
+PatternGet:Expr ::= Identifier:Name [FullSignature] ;
+
+PatternSet:Expr ::= Identifier:Name [FullSignature] ;
+
+Input ::= FullSignature* ;
+
+Output ::= FullSignature* ;
+
+PatternCall:Expr ::= Identifier:Name Input Output ;
+
+PatternExecution:Expr ::= Identifier:Name Input Output ;
+
+PatternMainExecution:Expr ;
+
+PatternLoop:Expr ::= [Type:Name] Identifier:Name ;
+
+PatternLoopHead:Expr ::= [Type:Name] Identifier:Name ;
+
+PatternLoopBody:Expr ::= [Type:Name] Identifier:Name ;
+
+Selector ::= Element:Name* ;
+
+PatternAnnotate:Expr ::= Identifier:Name Selector* ;
+
+PatternOperator:Expr ::= Type:Name FullSignature* ;
+
+PatternWithin:Expr ::= Type:Name Identifier:Name ;
+
+PatternDimension:Expr ::= DimensionSignature ;
+
+PatternIsType:Expr ::= TypeSignature ;
+
