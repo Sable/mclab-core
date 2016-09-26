@@ -6437,7 +6437,7 @@ public abstract class Builtin {
         }
         
     }
-    public static class Assert extends AbstractMatlabSystemFunction  {
+    public static class Assert extends AbstractMatlabSystemFunction implements HasShapePropagationInfo,HasClassPropagationInfo  {
         //returns the singleton instance of this class
         private static Assert singleton = null;
         public static Assert getInstance(){
@@ -6452,7 +6452,29 @@ public abstract class Builtin {
         public String getName(){
             return "assert";
         }
-        
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("#->[]");
+            }
+            return shapePropInfo;
+        }
+
+        public CP getMatlabClassPropagationInfo(){{
+            return getClassPropagationInfo();
+        }}
+
+        private CP classPropInfo = null;
+        public CP getClassPropagationInfo(){
+            //set classPropInfo if not defined
+            if (classPropInfo == null){
+                classPropInfo = ClassPropTool.parse("any -> none");
+                classPropInfo.setVar("parent",new CPNone());
+                classPropInfo.setVar("matlab",getMatlabClassPropagationInfo());
+            }
+            return classPropInfo;
+        }
     }
     public static class Nargoutchk extends AbstractMatlabSystemFunction  {
         //returns the singleton instance of this class
