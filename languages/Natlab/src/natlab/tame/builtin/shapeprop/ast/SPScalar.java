@@ -2,9 +2,9 @@ package natlab.tame.builtin.shapeprop.ast;
 
 import java.util.HashMap;
 
+import natlab.McLabCore;
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
-import natlab.tame.valueanalysis.components.constant.DoubleConstant;
-import natlab.tame.valueanalysis.components.constant.HasConstant;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.DimValue;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
@@ -71,13 +71,24 @@ public class SPScalar<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 						return previousMatchResult;						
 					}
 				}
-				else if (((HasConstant)argument).getConstant() instanceof DoubleConstant) {
-					double doubleValueArgument = ((DoubleConstant)((HasConstant)argument).getConstant()).getValue();
-					int intValueArgument = (int) doubleValueArgument;
-					if (Debug) System.out.println("argument has constant int value "+intValueArgument);
+				else if (((HasConstant)argument).getConstant() != null) {
+					Constant c = ((HasConstant)argument).getConstant();
+
 					String symbolic = argument.getSymbolic();
 					HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
-					lowercase.put(s, new DimValue(intValueArgument, symbolic));
+
+					if (c instanceof DoubleConstant) {
+						lowercase.put(s, new DimValue((int)((double)c.getValue()), symbolic));
+					} else if (c instanceof CharConstant) {
+						lowercase.put(s, new DimValue((int)c.getValue().toString().charAt(0), symbolic));
+					} else if (c instanceof LogicalConstant) {
+						lowercase.put(s, new DimValue(c.getValue().equals(Boolean.TRUE) ? 1 : 0, symbolic));
+					} else {
+					    if (McLabCore.options.debug()) {
+					    	System.out.println("WARNING: Unsupported constant class " + c.getClass().toString() + ", setting value to null");
+						}
+						lowercase.put(s, new DimValue(null, symbolic));
+					}
 					HashMap<String, Shape> uppercase = new HashMap<String, Shape>();
 					uppercase.put(s, ((HasShape)argument).getShape());
 					ShapePropMatch<V> match = new ShapePropMatch<V>(previousMatchResult, lowercase, uppercase);

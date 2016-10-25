@@ -18,14 +18,15 @@
 
 package natlab.tame.valueanalysis.components.constant;
 
-import java.util.List;
-
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
+import natlab.tame.valueanalysis.components.constant.*;
 import natlab.tame.valueanalysis.components.shape.DimValue;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
+
+import java.util.List;
 
 /**
  * propagates constants.
@@ -54,6 +55,7 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
         if (instance == null) instance = new ConstantPropagator();
         return instance;
     }
+    private boolean DEBUG = false;
     private ConstantPropagator(){} //hidden private constructor
      
     @Override
@@ -86,7 +88,17 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
         if (arg.size() == 2 && ((constants=arg.getConstants())!=null)){
             Constant a = constants.get(0);
             Constant b = constants.get(1);
-            if (a.getClass().equals(b.getClass())){
+
+            if (a.getClass() == LogicalConstant.class) {
+                if (DEBUG) System.out.println("Coercing value " + a + " to double ");
+                a = toDouble((LogicalConstant)a);
+            }
+            if (b.getClass() == LogicalConstant.class) {
+                if (DEBUG) System.out.println("Coercing value " + b + " to double ");
+                b = toDouble((LogicalConstant)b);
+            }
+
+            if (a.getClass().equals(b.getClass())) {
                 return Constant.get(a.equals(b));
             } else {
                 return null;
@@ -317,6 +329,14 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     		}
     	}
     	return null;
+    }
+
+    private Constant toDouble(LogicalConstant a) {
+        return new DoubleConstant(a.getValue() == new Boolean(true) ? 1 : 0);
+    }
+
+    private Constant toDouble(CharConstant a) {
+        return new DoubleConstant(a.getValue().charAt(0) + 0);
     }
 }
 
