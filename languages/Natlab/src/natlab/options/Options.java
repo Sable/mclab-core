@@ -365,6 +365,13 @@ public class Options {
 	@Parameter(names = { "--show_pref", "--show_preferences" }, description = "Displays all stored preferences")
 	protected boolean show_pref = false;
 
+	@Parameter(names = "--debug", description = "Display additional debugging information")
+	protected boolean debug = false;
+
+	public boolean debug() {
+		return debug;
+	}
+
 	/**
 	 * Displays all stored preferences
 	 */

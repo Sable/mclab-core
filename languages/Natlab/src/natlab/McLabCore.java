@@ -47,6 +47,8 @@ import com.google.common.base.Joiner;
  */
 public class McLabCore {
 
+	public static Options options = new Options();
+
 	private static void log(Options options, String message) {
 		if (!options.quiet()) {
 			System.err.println(message);
@@ -62,7 +64,6 @@ public class McLabCore {
 			System.err.println("No options given\nTry --help for usage");
 			return;
 		}
-		Options options = new Options();
 		options.parse(args);
 		run(options);
 	}
