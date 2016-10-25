@@ -667,7 +667,7 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                 	// changed by XU @ 6:41pm March 9th 2013, TODO unchecked!
                     results.add(Res.newInstance(factory.newMatrixValue(null, argMap.size())));
                 } else {
-                	if (Debug) System.out.println("calling propagatpr with argument "+argsObj);
+                	if (Debug) System.out.println("calling propagator with argument "+argsObj);
                 	results.add(valuePropagator.call(function.getName(), argsObj));
                 }
             }else{
