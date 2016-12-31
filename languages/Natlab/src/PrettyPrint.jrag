@@ -1,252 +1,953 @@
-// =========================================================================== //
-//                                                                             //
-// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
-//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
-//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
-//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
-//                                                                             //
-//   Licensed under the Apache License, Version 2.0 (the "License");           //
-//   you may not use this file except in compliance with the License.          //
-//   You may obtain a copy of the License at                                   //
-//                                                                             //
-//       http://www.apache.org/licenses/LICENSE-2.0                            //
-//                                                                             //
-//   Unless required by applicable law or agreed to in writing, software       //
-//   distributed under the License is distributed on an "AS IS" BASIS,         //
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
-//   See the License for the specific language governing permissions and       //
-//   limitations under the License.                                            //
-//                                                                             //
-// =========================================================================== //
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 aspect PrettyPrint {
-  protected static final String ASTNode.INDENT_TAB = "  ";
+    syn String ASTNode.getPrettyPrintedLessComments()      = "Not yet implement";
+    syn String ASTNode.getPrettyPrinted()                  = getPrettyPrintedLessComments();
 
-  protected static <T extends ASTNode<?>> String ASTNode.join(String delimiter, Iterable<T> nodes) {
-    String result = Joiner.on(delimiter).join(FluentIterable.from(nodes)
-        .transform(new com.google.common.base.Function<ASTNode<?>, String>() {
-          @Override public String apply(ASTNode<?> node) {
-            return node.getPrettyPrinted();
-          }
-        })
-        .filter(Predicates.not(Predicates.containsPattern("^$"))));
-
-    if (!result.isEmpty() && delimiter.equals("\n")) {
-      result += "\n";
+    private final String CompilationUnits.getPrettyPrinted(boolean withComment) {
+        if (withComment) {
+            return prettyPrintJoinByDelimiterWithComment(NEW_LINE, getProgramList());
+        } else {
+            return prettyPrintJoinByDelimiter(NEW_LINE, getProgramList());
+        }
     }
-    return result;
-  }
+    eq CompilationUnits.getPrettyPrintedLessComments()     = getPrettyPrinted(false);
+    eq CompilationUnits.getPrettyPrinted()                 = getPrettyPrinted(true);
 
-  syn String ASTNode.getPrettyPrinted() {
-    StringBuffer buf = new StringBuffer();
-    for (beaver.Symbol comment : getComments()) {
-      buf.append(getIndent() + comment.value + "\n");
+    /* McSAF AST program */
+    private final String Script.getPrettyPrinted(boolean withComment) {
+        if (withComment) {
+            return getIndent() + prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            return getIndent() + prettyPrintJoinByDelimiter(NEW_LINE, getStmtList());
+        }
     }
-    buf.append(getPrettyPrintedLessComments());
-    return buf.toString();
-  }
+    eq Script.getPrettyPrintedLessComments()               = getPrettyPrinted(false);
+    eq Script.getPrettyPrinted()                           = getPrettyPrinted(true);
 
-  //case Stmt - print comments after the statement
-  syn String Stmt.getPrettyPrinted(){
-    StringBuffer buf = new StringBuffer();
-    buf.append(getPrettyPrintedLessComments());
-    // first comment - spaces between stmt and comment - EmptyStmt get printed without extra spaces
-    String space = (this instanceof EmptyStmt) ? "" : "  ";
-    for (beaver.Symbol comment : getComments()) {
-      buf.append(space + comment.value);
-      space = "\n" + getIndent(); // later comments -- full indent
+    private final String FunctionList.getPrettyPrinted(boolean withComment) {
+        if (withComment) {
+            return getIndent() + prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getFunctionList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            return getIndent() + prettyPrintJoinByDelimiter(NEW_LINE, getFunctionList());
+        }
     }
-    return buf.toString();
-  }
+    eq FunctionList.getPrettyPrintedLessComments()         = getPrettyPrinted(false);
+    eq FunctionList.getPrettyPrinted()                     = getPrettyPrinted(true);
 
-  //Special case to deal with comments at the end of functions
-  syn String Function.getPrettyPrinted() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(getPrettyPrintedLessComments());
-
-    StringBuffer cbuf = new StringBuffer();
-    for (beaver.Symbol comment : getComments()) {
-      cbuf.append(comment.value + "\n");
+    private final String Function.getPrettyPrinted(boolean withComment) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append(String.format("function [%s] = %s(%s)",
+                prettyPrintJoinByDelimiter(", ", getOutputParamList()),
+                getName().getPrettyPrintedLessComments(),
+                prettyPrintJoinByDelimiter(", ", getInputParamList())
+            ))
+            .append(NEW_LINE);
+        final String functionBodyToString;
+        if (withComment) {
+            functionBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getNestedFunctionList(),
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            functionBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getNestedFunctionList(),
+                getStmtList()
+            ));
+        }
+        builder.append(functionBodyToString)
+            .append(functionBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    if (cbuf.length() > 0) {
-      buf.insert(buf.length() - getIndent().length() - 3, cbuf.toString());
+    eq Function.getPrettyPrintedLessComments()             = getPrettyPrinted(false);
+    eq Function.getPrettyPrinted()                         = getPrettyPrinted(true);
+
+    private final String ClassDef.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (getNumAttribute() == 0) {
+            builder.append(String.format("classdef %s", getName()));
+        } else {
+            builder.append(String.format("classdef (%s) %s",
+                prettyPrintJoinByDelimiter(", ", getAttributeList()),
+                getName()
+            ));
+        }
+        if (getNumSuperClass() == 0) {
+            builder.append(NEW_LINE);
+        } else {
+            builder.append(" < ")
+                .append(prettyPrintJoinByDelimiter(" & ", getSuperClassList()))
+                .append(NEW_LINE);
+        }
+        final String classDefBodyToString;
+        if (withComments) {
+            classDefBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getPropertyList(),
+                getMethodList(),
+                getClassEventList(),
+                getEnumerationList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            classDefBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getPropertyList(),
+                getMethodList(),
+                getClassEventList(),
+                getEnumerationList()
+            ));
+        }
+        builder.append(classDefBodyToString)
+            .append(classDefBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return buf.toString();
-  }
+    eq ClassDef.getPrettyPrintedLessComments()             = getPrettyPrinted(false);
+    eq ClassDef.getPrettyPrinted()                         = getPrettyPrinted(true);
 
-  syn String ASTNode.getIndent() {
-    ASTNode parent = getParent();
-    if (parent == null) {
-      return "";
+    eq Attribute.getPrettyPrintedLessComments()            = String.format("%s = %s", getKey(), getExpr().getPrettyPrintedLessComments());
+    eq SuperClass.getPrettyPrintedLessComments()           = getName();
+
+    private final String Properties.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (getNumAttribute() == 0) {
+            builder.append("properties").append(NEW_LINE);
+        } else {
+            builder.append(String.format("properties (%s)", prettyPrintJoinByDelimiter(", ", getAttributeList()))).append(NEW_LINE);
+        }
+        final String propertyBodyToString;
+        if (withComments) {
+            propertyBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getPropertyList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            propertyBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getPropertyList());
+        }
+        builder.append(propertyBodyToString)
+            .append(propertyBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return parent.getIndent();
-  }
+    eq Properties.getPrettyPrintedLessComments()           = getPrettyPrinted(false);
+    eq Properties.getPrettyPrinted()                       = getPrettyPrinted(true);
 
-  eq Stmt.getIndent() {
-    ASTNode parent = getParent();
-    if (parent == null || parent.getParent() instanceof Program) {
-      return "";
+    private final String Methods.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (getNumAttribute() == 0) {
+            builder.append("methods").append(NEW_LINE);
+        } else {
+            builder.append(String.format("methods (%s)", prettyPrintJoinByDelimiter(", ", getAttributeList()))).append(NEW_LINE);
+        }
+        final String methodsBodyToString;
+        if (withComments) {
+            methodsBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getSignatureList(),
+                getFunctionList(),
+                getPropAccSigList(),
+                getPropAccList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            methodsBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getSignatureList(),
+                getFunctionList(),
+                getPropAccSigList(),
+                getPropAccList()
+            ));
+        }
+        builder.append(methodsBodyToString)
+            .append(methodsBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return parent.getIndent() + ASTNode.INDENT_TAB;
-  }
+    eq Methods.getPrettyPrintedLessComments()              = getPrettyPrinted(false);
+    eq Methods.getPrettyPrinted()                          = getPrettyPrinted(true);
 
-  eq Function.getIndent() {
-    ASTNode parent = getParent();
-    if (parent == null || parent.getParent() instanceof Program) {
-      return "";
+    private final String ClassEvents.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (getNumAttribute() == 0) {
+            builder.append("events").append(NEW_LINE);
+        } else {
+            builder.append(String.format("events (%s)", prettyPrintJoinByDelimiter(", ", getAttributeList()))).append(NEW_LINE);
+        }
+        final String eventsBodyToString;
+        if (withComments) {
+            eventsBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getEventList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            eventsBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getEventList());
+        }
+        builder.append(eventsBodyToString)
+            .append(eventsBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return parent.getIndent() + ASTNode.INDENT_TAB;
-  }
+    eq ClassEvents.getPrettyPrintedLessComments()          = getPrettyPrinted(false);
+    eq ClassEvents.getPrettyPrinted()                      = getPrettyPrinted(true);
 
-  syn String ASTNode.getPrettyPrintedLessComments() {
-    throw new UnsupportedOperationException(getClass().getName() + ".getPrettyPrintedLessComments()");
-  }
-
-  protected String Stmt.wrap(String s, Object... args) {
-    return getIndent() +
-      (args.length == 0 ? s : String.format(s, args)) +
-      (isOutputSuppressed() ? ";" : "");
-  }
-
-  eq CSLExpr.getPrettyPrintedLessComments() =
-    String.format("CSL[%s]", getName().getPrettyPrinted());
-  eq EndCallExpr.getPrettyPrintedLessComments() =
-    String.format("end(%s, %s, %s)", getArray().getPrettyPrinted(), getNumDim(), getWhatDim());
-  eq CheckScalarStmt.getPrettyPrintedLessComments() = wrap("check_scalar(%s)", getNameExpr().getPrettyPrinted());
-
-  eq CompilationUnits.getPrettyPrintedLessComments() = join("\n==========================\n\n", getPrograms());
-  eq Script.getPrettyPrintedLessComments() = join("\n", getHelpComments()) + join("\n", getStmts());
-  eq FunctionList.getPrettyPrintedLessComments() = join("\n", getFunctions());
-  eq FunctionList.getPrettyPrinted() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(getPrettyPrintedLessComments());
-    for(beaver.Symbol comment : getComments()) {
-      buf.append(comment.value);
-      buf.append("\n");
+    private final String Enumerations.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (getNumAttribute() == 0) {
+            builder.append("enumeration").append(NEW_LINE);
+        } else {
+            builder.append(String.format("enumeration (%s)", prettyPrintJoinByDelimiter(", ", getAttributeList()))).append(NEW_LINE);
+        }
+        final String enumerationBodyToString;
+        if (withComments) {
+            enumerationBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getEnumerationList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            enumerationBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getEnumerationList());
+        }
+        builder.append(enumerationBodyToString)
+            .append(enumerationBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return buf.toString();
-  }
-  eq Function.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s(%s)\n%s%s%s%send",
-    getIndent(), join(", ", getOutputParams()), getName().getID(),
-    join(", ", getInputParams()), join("\n", getHelpComments()),
-    join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
-  eq HelpComment.getPrettyPrintedLessComments() = getText();
+    eq Enumerations.getPrettyPrintedLessComments()         = getPrettyPrinted(false);
+    eq Enumerations.getPrettyPrinted()                     = getPrettyPrinted(true);
 
-  eq EmptyStmt.getPrettyPrintedLessComments() = "";
-  eq ExprStmt.getPrettyPrintedLessComments() = wrap(getExpr().getPrettyPrinted());
-  eq AssignStmt.getPrettyPrintedLessComments() = wrap("%s = %s", getLHS().getPrettyPrinted(), getRHS().getPrettyPrinted());
-  eq GlobalStmt.getPrettyPrintedLessComments() = wrap("global %s", join(" ", getNames()));
-  eq PersistentStmt.getPrettyPrintedLessComments() = wrap("persistent %s", join(" ", getNames()));
-  eq ShellCommandStmt.getPrettyPrintedLessComments() = wrap("!%s", getCommand());
-  eq BreakStmt.getPrettyPrintedLessComments() = wrap("break");
-  eq ContinueStmt.getPrettyPrintedLessComments() = wrap("continue");
-  eq ReturnStmt.getPrettyPrintedLessComments() = wrap("return");
-  eq ForStmt.getPrettyPrintedLessComments() = String.format("%s%sfor %s\n%s%send",
-    getIndent(), isParfor() ? "par" : "", getAssignStmt().getPrettyPrinted().trim(),
-    join("\n", getStmts()), getIndent());
-  eq WhileStmt.getPrettyPrintedLessComments() = String.format("%swhile %s\n%s%send",
-    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()), getIndent());
-  eq IfStmt.getPrettyPrintedLessComments() = String.format("%sif %s%s%send",
-    getIndent(), join(getIndent() + "elseif ", getIfBlocks()),
-    hasElseBlock() ? getElseBlock().getPrettyPrinted() : "", getIndent());
-  eq IfBlock.getPrettyPrintedLessComments() = String.format("%s\n%s",
-    getCondition().getPrettyPrinted(), join("\n", getStmts()));
-  eq ElseBlock.getPrettyPrintedLessComments() = String.format("%selse \n%s",
-    getIndent(), join("\n", getStmts()));
-  eq SwitchStmt.getPrettyPrintedLessComments() = String.format("%sswitch %s\n%s%s%send",
-    getIndent(), getExpr().getPrettyPrinted(), join("", getSwitchCaseBlocks()),
-    hasDefaultCaseBlock() ? getDefaultCaseBlock().getPrettyPrinted() : "", getIndent());
-  eq SwitchCaseBlock.getPrettyPrintedLessComments() = String.format("%scase %s\n%s",
-    getIndent(), getExpr().getPrettyPrinted(), join("\n", getStmts()));
-  eq DefaultCaseBlock.getPrettyPrintedLessComments() = String.format("%sotherwise \n%s",
-    getIndent(), join("\n", getStmts()));
-  eq TryStmt.getPrettyPrintedLessComments() = String.format("%stry \n%s%s%send",
-    getIndent(), join("\n", getTryStmts()),
-    getCatchStmts().getNumChild() > 0 ? (getIndent() + "catch \n" + join("\n", getCatchStmts())) : "",
-    getIndent());
+    eq Property.getPrettyPrintedLessComments()             = getIndent() + String.format("%s = %s", getName(), getExpr().getPrettyPrintedLessComments());
+    eq Signature.getPrettyPrintedLessComments()            = getIndent() + String.format("[%s] = %s(%s)", getOutputParamList(), getName(), getInputParamList());
 
-  eq RangeExpr.getPrettyPrintedLessComments() = String.format("(%s : %s%s)",
-    getLower().getPrettyPrinted(),
-    hasIncr() ? (getIncr().getPrettyPrinted() + " : ") : "",
-    getUpper().getPrettyPrinted());
-  eq ColonExpr.getPrettyPrintedLessComments() = ":";
-  eq EndExpr.getPrettyPrintedLessComments() = "end";
-  eq Name.getPrettyPrintedLessComments() = getID();
-  eq NameExpr.getPrettyPrintedLessComments() = getName().getPrettyPrinted();
-  eq DotExpr.getPrettyPrintedLessComments() = getTarget().getPrettyPrinted() + "." + getField().getPrettyPrinted();
-  eq ParameterizedExpr.getPrettyPrintedLessComments() = String.format("%s(%s)",
-    getTarget().getPrettyPrinted(), join(", ", getArgs()));
-  eq CellIndexExpr.getPrettyPrintedLessComments() = String.format("%s{%s}",
-    getTarget().getPrettyPrinted(), join(", ", getArgs()));
-  eq MatrixExpr.getPrettyPrintedLessComments() = String.format("[%s]", join("; ", getRows()));
-  eq CellArrayExpr.getPrettyPrintedLessComments() = String.format("{%s}", join("; ", getRows()));
-  eq Row.getPrettyPrintedLessComments() = join(", ", getElements());
-  eq FunctionHandleExpr.getPrettyPrintedLessComments() = "@" + getName().getPrettyPrinted();
-  eq LambdaExpr.getPrettyPrintedLessComments() = String.format("(@(%s) %s)",
-    join(", ", getInputParams()), getBody().getPrettyPrinted());
-  eq IntLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
-  eq FPLiteralExpr.getPrettyPrintedLessComments() = getValue().getText();
-  eq StringLiteralExpr.getPrettyPrintedLessComments() = "'" + getValue().replaceAll("'", "''") + "'";
-  eq UMinusExpr.getPrettyPrintedLessComments() = "(-" + getOperand().getPrettyPrinted() + ")";
-  eq UPlusExpr.getPrettyPrintedLessComments() = "(+" + getOperand().getPrettyPrinted() + ")";
-  eq NotExpr.getPrettyPrintedLessComments() = "(~" + getOperand().getPrettyPrinted() + ")";
-  eq MTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + "')";
-  eq ArrayTransposeExpr.getPrettyPrintedLessComments() = "(" + getOperand().getPrettyPrinted() + ".')";
-
-  syn String BinaryExpr.getPrettyPrintedLessComments(String op) = "(" + getLHS().getPrettyPrinted() + " " + op + " " + getRHS().getPrettyPrinted() + ")";
-  eq PlusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("+");
-  eq MinusExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("-");
-  eq MTimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("*");
-  eq MDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("/");
-  eq MLDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("\\");
-  eq MPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("^");
-  eq ETimesExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".*");
-  eq EDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("./");
-  eq ELDivExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".\\");
-  eq EPowExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(".^");
-  eq AndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&");
-  eq OrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("|");
-  eq ShortCircuitAndExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("&&");
-  eq ShortCircuitOrExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("||");
-  eq LTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<");
-  eq GTExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">");
-  eq LEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("<=");
-  eq GEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments(">=");
-  eq EQExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("==");
-  eq NEExpr.getPrettyPrintedLessComments() = getPrettyPrintedLessComments("~=");
-
-  protected static String ASTNode.joinAttributes(ast.List<Attribute> attrs) {
-    String attributes = join(", ", attrs);
-    if (!attributes.isEmpty()) {
-      attributes = "(" + attributes + ") ";
+    private final String PropertyAccess.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append(String.format("function [%s] = %s.%s(%s)",
+                prettyPrintJoinByDelimiter(", ", getOutputParamList()),
+                getAccess(),
+                getName(),
+                prettyPrintJoinByDelimiter(", ", getInputParamList())
+            ));
+        final String propertyAccessBodyToString;
+        if (withComments) {
+            propertyAccessBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getNestedFunctionList(),
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            propertyAccessBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getNestedFunctionList(),
+                getStmtList()
+            ));
+        }
+        builder.append(propertyAccessBodyToString)
+            .append(propertyAccessBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
     }
-    return attributes;
-  }
+    eq PropertyAccess.getPrettyPrintedLessComments()       = getPrettyPrinted(false);
+    eq PropertyAccess.getPrettyPrinted()                   = getPrettyPrinted(true);
 
-  eq ClassDef.getPrettyPrintedLessComments() = String.format("classdef %s%s%s\n%s%s%s%send",
-    joinAttributes(getAttributes()), getName(),
-    getNumSuperClass() > 0 ? (" < " + join(" & ", getSuperClasss())) : "",
-    join("\n", getHelpComments()), join("\n", getPropertys()),
-    join("\n", getMethods()), join("\n", getClassEvents()));
-  eq Properties.getPrettyPrintedLessComments() = String.format("%sproperties %s\n%s%send",
-    getIndent(), joinAttributes(getAttributes()), join("\n", getPropertys()), getIndent());
-  eq Methods.getPrettyPrintedLessComments() = String.format("%smethods %s\n%s%s%s%send",
-    getIndent(), joinAttributes(getAttributes()), join("\n", getSignatures()),
-    join("\n", getPropAccs()), join("\n", getFunctions()), getIndent());
-  eq Signature.getPrettyPrintedLessComments() = String.format("%s[%s] = %s(%s)",
-    getIndent(), join(", ", getOutputParams()), getName(), join(", ", getInputParams()));
-  eq PropertyAccess.getPrettyPrintedLessComments() = String.format("%sfunction [%s] = %s.%s(%s)\n%s%s%s%send",
-    getIndent(), join(", ", getOutputParams()), getAccess(), getName(), join(", ", getInputParams()),
-    join("\n", getHelpComments()), join("\n", getStmts()), join("\n", getNestedFunctions()), getIndent());
-  eq ClassEvents.getPrettyPrintedLessComments() = String.format("%sevents %s\n%s%send",
-    getIndent(), joinAttributes(getAttributes()), join("\n", getEvents()), getIndent());
-  eq Attribute.getPrettyPrintedLessComments() = getKey() + " = " + getExpr().getPrettyPrinted();
-  eq SuperClass.getPrettyPrintedLessComments() = getName();
-  eq Property.getPrettyPrintedLessComments() = getIndent() + getName() + " = " + getExpr().getPrettyPrinted() + ";";
-  eq Event.getPrettyPrintedLessComments() = getIndent() + getName();
-  eq SuperClassMethodExpr.getPrettyPrintedLessComments() = getFuncName().getPrettyPrinted() + "@" + getClassName().getPrettyPrinted();
+    eq PropertyAccessSignature.getPrettyPrintedLessComments() {
+        return String.format("%s[%s] = %s.%s(%s)",
+            getIndent(),
+            prettyPrintJoinByDelimiter(", ", getOutputParamList()),
+            getAccess(),
+            getName(),
+            prettyPrintJoinByDelimiter(", ", getInputParamList())
+        );
+    }
+    eq Event.getPrettyPrintedLessComments()                = getIndent() + getName();
+    /* McSAF AST statement  */
+    eq ExprStmt.getPrettyPrintedLessComments()             = new StringBuilder().append(getIndent())
+        .append(String.format("%s", getExpr().getPrettyPrintedLessComments()))
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq AssignStmt.getPrettyPrintedLessComments()           = new StringBuilder().append(getIndent())
+        .append(getLHS().getPrettyPrintedLessComments())
+        .append(" = ")
+        .append(getRHS().getPrettyPrintedLessComments())
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq GlobalStmt.getPrettyPrintedLessComments()           = new StringBuilder().append(getIndent())
+        .append("global ")
+        .append(prettyPrintJoinByDelimiter(" ", getNameList()))
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq PersistentStmt.getPrettyPrintedLessComments()       = new StringBuilder().append(getIndent())
+        .append("persistent ")
+        .append(prettyPrintJoinByDelimiter(" ", getNameList()))
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq ShellCommandStmt.getPrettyPrintedLessComments()     = new StringBuilder().append(getIndent())
+        .append(getCommand())
+        .toString();
+    eq BreakStmt.getPrettyPrintedLessComments()            = new StringBuilder().append(getIndent())
+        .append("break")
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq ContinueStmt.getPrettyPrintedLessComments()         = new StringBuilder().append(getIndent())
+        .append("continue")
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq ReturnStmt.getPrettyPrintedLessComments()           = new StringBuilder().append(getIndent())
+        .append("return")
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+    eq EmptyStmt.getPrettyPrintedLessComments()            = new StringBuilder()
+        .append("$_empty_statement()")
+        .append((isOutputSuppressed())?";":"")
+        .toString();
+
+    private final String ForStmt.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (!getisParfor()) {
+            builder.append("for ").append((withComments)?
+                getAssignStmt().getPrettyPrinted():
+                getAssignStmt().getPrettyPrintedLessComments()
+            ).append(NEW_LINE);
+        } else {
+            if (hasWorker()) {
+                builder.append(String.format("parfor (%s, %s)",
+                    (withComments)?getAssignStmt().getPrettyPrinted():getAssignStmt().getPrettyPrintedLessComments(),
+                    (withComments)?getWorker().getPrettyPrinted():getWorker().getPrettyPrintedLessComments()
+                )).append(NEW_LINE);
+            } else {
+                builder.append("parfor ").append((withComments)?
+                    getAssignStmt().getPrettyPrinted():
+                    getAssignStmt().getPrettyPrintedLessComments()
+                ).append(NEW_LINE);
+            }
+        }
+        final String forBodyToString;
+        if (withComments) {
+            forBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            forBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getStmtList());
+        }
+        builder.append(forBodyToString)
+            .append(forBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString();
+    }
+    eq ForStmt.getPrettyPrintedLessComments()              = getPrettyPrinted(false);
+    eq ForStmt.getPrettyPrinted()                          = getPrettyPrinted(true);
+
+    private final String WhileStmt.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append("while ")
+            .append((withComments)?getExpr().getPrettyPrinted():getExpr().getPrettyPrintedLessComments())
+            .append(NEW_LINE);
+        final String whileBodyToString;
+        if (withComments) {
+            whileBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            whileBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getStmtList());
+        }
+        builder.append(whileBodyToString)
+            .append(whileBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString();
+    }
+    eq WhileStmt.getPrettyPrintedLessComments()            = getPrettyPrinted(false);
+    eq WhileStmt.getPrettyPrinted()                        = getPrettyPrinted(true);
+
+    private final String TryStmt.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append("try").append(NEW_LINE);
+        final String tryPartToString;
+        final java.util.List<HelpComment> helpComment = getCommentsAsASTNode().stream()
+            .map(new java.util.function.Function<ASTNode, HelpComment> () {
+                @Override
+                public HelpComment apply(ASTNode node) {
+                    assert node instanceof HelpComment;
+                    return (HelpComment) node;
+                }
+            }).collect(Collectors.toList());
+        final java.util.List<HelpComment> catchComment = getCommentsCatchPart();
+        final java.util.List<HelpComment> tryComment = helpComment.stream()
+            .filter(new java.util.function.Predicate<HelpComment> () {
+                @Override
+                public boolean test(HelpComment comment) {
+                    return !catchComment.contains(comment);
+                }
+            }).collect(Collectors.toList());
+        if (withComments) {
+            tryPartToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getTryStmtList(),
+                tryComment
+            ));
+        } else {
+            tryPartToString = prettyPrintJoinByDelimiter(NEW_LINE, getTryStmtList());
+        }
+        builder.append(tryPartToString)
+            .append(tryPartToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("catch")
+            .append(hasCatchName()?" " + getCatchName().getPrettyPrintedLessComments(): "")
+            .append(NEW_LINE);
+        final String catchPartToString;
+        if (withComments) {
+            catchPartToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getCatchStmtList(),
+                catchComment
+            ));
+        } else {
+            catchPartToString = prettyPrintJoinByDelimiter(NEW_LINE, getCatchStmtList());
+        }
+        builder.append(catchPartToString)
+            .append(catchPartToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString();
+    }
+    eq TryStmt.getPrettyPrintedLessComments()              = getPrettyPrinted(false);
+    eq TryStmt.getPrettyPrinted()                          = getPrettyPrinted(true);
+
+    private final String SwitchStmt.getPrettyPrinted(final boolean withComments) {
+        final java.util.function.Function<ast.SwitchCaseBlock, String> caseBlockToString = new java.util.function.Function<ast.SwitchCaseBlock, String>() {
+            @Override
+            public String apply(ast.SwitchCaseBlock block) {
+                StringBuilder builder = new StringBuilder().append(block.getIndent())
+                    .append("case ")
+                    .append(block.getExpr().getPrettyPrintedLessComments());
+                final String caseBlockBodyToString;
+                if (withComments) {
+                    caseBlockBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                        block.getStmtList(),
+                        block.getCommentsAsASTNode()
+                    ));
+                } else {
+                    caseBlockBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, block.getStmtList());
+                }
+                return builder.append(caseBlockBodyToString.isEmpty()?"":NEW_LINE)
+                    .append(caseBlockBodyToString)
+                    .toString();
+            }
+        };
+        final java.util.function.Function<ast.DefaultCaseBlock, String> defaultCaseToString = new java.util.function.Function<ast.DefaultCaseBlock, String>() {
+            @Override
+            public String apply(ast.DefaultCaseBlock block) {
+                StringBuilder builder = new StringBuilder().append(block.getIndent())
+                    .append("otherwise");
+                final String caseBlockBodyToString;
+                if (withComments) {
+                    caseBlockBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                        block.getStmtList(),
+                        block.getCommentsAsASTNode()
+                    ));
+                } else {
+                    caseBlockBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, block.getStmtList());
+                }
+                return builder.append(caseBlockBodyToString.isEmpty()?"":NEW_LINE)
+                    .append(caseBlockBodyToString)
+                    .toString();
+            }
+        };
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append("switch ")
+            .append(getExpr().getPrettyPrintedLessComments())
+            .append(NEW_LINE);
+        final String switchBodyToString = prettyPrintConcatThenSort(
+                getSwitchCaseBlockList(),
+                (hasDefaultCaseBlock())?
+                    java.util.Collections.singletonList(getDefaultCaseBlock()):
+                    java.util.Collections.emptyList(),
+                (withComments)?
+                    getCommentsAsASTNode():
+                    java.util.Collections.emptyList()
+        ).stream()
+            .map(new java.util.function.Function<ASTNode, String>() {
+                @Override
+                public String apply(ASTNode node) {
+                    if (node instanceof HelpComment) {
+                        return ((HelpComment) node).getPrettyPrinted();
+                    } else if (node instanceof SwitchCaseBlock) {
+                        return caseBlockToString.apply((SwitchCaseBlock) node);
+                    } else if (node instanceof DefaultCaseBlock) {
+                        return defaultCaseToString.apply((DefaultCaseBlock) node);
+                    } else {
+                        /* control flow should not reach here */
+                        throw new AssertionError();
+                    }
+                }
+            })
+            .collect(Collectors.joining(NEW_LINE));
+        builder.append(switchBodyToString)
+            .append(switchBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString();
+    }
+    eq SwitchStmt.getPrettyPrintedLessComments()           = getPrettyPrinted(false);
+    eq SwitchStmt.getPrettyPrinted()                       = getPrettyPrinted(true);
+
+    eq SwitchCaseBlock.getPrettyPrintedLessComments()      = "Invoke SwitchCaseBlock#getParent().getParent().getPrettyPrintedLessComments()";
+    eq SwitchCaseBlock.getPrettyPrinted()                  = "Invoke SwitchCaseBlock#getParent().getParent().getPrettyPrinted()";
+    eq DefaultCaseBlock.getPrettyPrintedLessComments()     = "Invoke DefaultCaseBlock#getParent().getPrettyPrintedLessComments()";
+    eq DefaultCaseBlock.getPrettyPrinted()                 = "Invoke DefaultCaseBlock#getParent().getPrettyPrinted()";
+
+    private final String IfStmt.getPrettyPrinted(final boolean withComments) {
+        final java.util.function.Function<ast.IfBlock, String> ifBlockToString = new java.util.function.Function<ast.IfBlock, String>() {
+            @Override
+            public String apply(ast.IfBlock ifBlock) {
+                StringBuilder builder = new StringBuilder().append(getIndent())
+                    .append("elseif ")
+                    .append(ifBlock.getCondition().getPrettyPrintedLessComments());
+                final String ifBlockToString;
+                if (withComments) {
+                    ifBlockToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                        ifBlock.getStmtList(),
+                        ifBlock.getCommentsAsASTNode()
+                    ));
+                } else {
+                    ifBlockToString = prettyPrintJoinByDelimiter(NEW_LINE, ifBlock.getStmtList());
+                }
+                builder.append(ifBlockToString.isEmpty()?"":NEW_LINE)
+                    .append(ifBlockToString);
+                return builder.toString();
+            }
+        };
+        final java.util.function.Function<ast.ElseBlock, String> elseBlockToString = new java.util.function.Function<ast.ElseBlock, String>() {
+            @Override
+            public String apply(ast.ElseBlock elseBlock) {
+                StringBuilder builder = new StringBuilder().append("else");
+                final String elseBlockToString;
+                if (withComments) {
+                    elseBlockToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                        elseBlock.getStmtList(),
+                        elseBlock.getCommentsAsASTNode()
+                    ));
+                } else {
+                    elseBlockToString = prettyPrintJoinByDelimiter(NEW_LINE, elseBlock.getStmtList());
+                }
+                builder.append(elseBlockToString.isEmpty()?"":NEW_LINE)
+                    .append(elseBlockToString);
+                return builder.toString();
+            }
+        };
+        StringBuilder builder = new StringBuilder();
+        final String ifBodyToString = prettyPrintConcatThenSort(
+            getIfBlockList(),
+            (hasElseBlock())?
+                Collections.singletonList(getElseBlock()):
+                Collections.emptyList(),
+            (withComments)?
+                getCommentsAsASTNode():
+                Collections.emptyList()
+        ).stream()
+            .map(new java.util.function.Function<ASTNode, String>() {
+                @Override
+                public String apply(ASTNode node) {
+                    if (node instanceof ast.IfBlock) {
+                        return ifBlockToString.apply((ast.IfBlock) node);
+                    } else if (node instanceof ast.ElseBlock) {
+                        return elseBlockToString.apply((ast.ElseBlock) node);
+                    } else if (node instanceof ast.HelpComment) {
+                        return ((ast.HelpComment) node).getPrettyPrinted();
+                    } else {
+                        /* control flow should not reach here */
+                        throw new AssertionError();
+                    }
+                }
+            })
+            .collect(Collectors.joining(NEW_LINE + getIndent()));
+        builder.append(ifBodyToString)
+            .append(ifBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString().substring(4);
+    }
+    eq IfStmt.getPrettyPrintedLessComments()               = getPrettyPrinted(false);
+    eq IfStmt.getPrettyPrinted()                           = getPrettyPrinted(true);
+
+    eq IfBlock.getPrettyPrintedLessComments()              = "Invoke IfBlock#getParent().getParent().getPrettyPrintedLessComments()";
+    eq IfBlock.getPrettyPrinted()                          = "Invoke IfBlock#getParent().getParent().getPrettyPrinted()";
+    eq ElseBlock.getPrettyPrintedLessComments()            = "Invoke ElseBlock#getParent().getPrettyPrintedLessComments()";
+    eq ElseBlock.getPrettyPrinted()                        = "Invoke ElseBlock#getParent().getPrettyPrinted()";
+
+    private final String SpmdStmt.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent());
+        if (!hasMinWorker() && !hasMaxWorker()) {
+            builder.append("spmd");
+        } else if (hasMinWorker() && !hasMaxWorker()) {
+            builder.append(String.format("spmd (%s)", getMinWorker().getPrettyPrintedLessComments()));
+        } else if (hasMinWorker() && hasMaxWorker()) {
+            builder.append(String.format("spmd (%s, %s)",
+                getMinWorker().getPrettyPrintedLessComments(),
+                getMaxWorker().getPrettyPrintedLessComments()
+            ));
+        } else {
+            throw new AssertionError();
+        }
+        final String spmdBodyToString;
+        if (withComments) {
+            spmdBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            spmdBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, getStmtList());
+        }
+        builder.append(spmdBodyToString)
+            .append(spmdBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end")
+            .append(isOutputSuppressed()?";":"");
+        return builder.toString();
+    }
+    eq SpmdStmt.getPrettyPrintedLessComments()             = getPrettyPrinted(false);
+    eq SpmdStmt.getPrettyPrinted()                         = getPrettyPrinted(true);
+
+    /* McSAF AST expression */
+    eq NameExpr.getPrettyPrintedLessComments()             = getName().getPrettyPrintedLessComments();
+    eq ParameterizedExpr.getPrettyPrintedLessComments()    = String.format("%s(%s)", getTarget().getPrettyPrintedLessComments(), prettyPrintJoinByDelimiter(", ", getArgList()));
+    eq CellIndexExpr.getPrettyPrintedLessComments()        = String.format("%s{%s}", getTarget().getPrettyPrintedLessComments(), prettyPrintJoinByDelimiter(", ", getArgList()));
+    eq DotExpr.getPrettyPrintedLessComments()              = String.format("%s.%s",  getTarget().getPrettyPrintedLessComments(), getField().getPrettyPrintedLessComments());
+    eq MatrixExpr.getPrettyPrintedLessComments()           = String.format("[%s]",   prettyPrintJoinByDelimiter("; ", getRowList()));
+
+    eq Row.getPrettyPrintedLessComments()                  = prettyPrintJoinByDelimiter(", ", getElementList());
+
+    eq IntLiteralExpr.getPrettyPrintedLessComments()       = getValue().getText();
+    eq FPLiteralExpr.getPrettyPrintedLessComments()        = getValue().getText();
+    eq StringLiteralExpr.getPrettyPrintedLessComments()    = getValue();
+
+    protected String UnaryExpr.unaryExprPrettyPrintedLessComments(String operatorFormat) {
+        return String.format(operatorFormat, getOperand().getPrettyPrintedLessComments());
+    }
+    eq UMinusExpr.getPrettyPrintedLessComments()           = unaryExprPrettyPrintedLessComments("(- %s)");
+    eq UPlusExpr.getPrettyPrintedLessComments()            = unaryExprPrettyPrintedLessComments("(+ %s)");
+    eq NotExpr.getPrettyPrintedLessComments()              = unaryExprPrettyPrintedLessComments("(~ %s)");
+    eq MTransposeExpr.getPrettyPrintedLessComments()       = unaryExprPrettyPrintedLessComments("(%s ')");
+    eq ArrayTransposeExpr.getPrettyPrintedLessComments()   = unaryExprPrettyPrintedLessComments("(%s .')");
+
+    protected String BinaryExpr.binaryExprPrettyPrintedLessComments(String operatorFormat) {
+        return String.format(operatorFormat, getLHS().getPrettyPrintedLessComments(), getRHS().getPrettyPrintedLessComments());
+    }
+    eq PlusExpr.getPrettyPrintedLessComments()             = binaryExprPrettyPrintedLessComments("(%s + %s)");
+    eq MinusExpr.getPrettyPrintedLessComments()            = binaryExprPrettyPrintedLessComments("(%s - %s)");
+    eq MTimesExpr.getPrettyPrintedLessComments()           = binaryExprPrettyPrintedLessComments("(%s * %s)");
+    eq MDivExpr.getPrettyPrintedLessComments()             = binaryExprPrettyPrintedLessComments("(%s / %s)");
+    eq MLDivExpr.getPrettyPrintedLessComments()            = binaryExprPrettyPrintedLessComments("(%s \\ %s)");
+    eq MPowExpr.getPrettyPrintedLessComments()             = binaryExprPrettyPrintedLessComments("(%s ^ %s)");
+    eq ETimesExpr.getPrettyPrintedLessComments()           = binaryExprPrettyPrintedLessComments("(%s .* %s)");
+    eq EDivExpr.getPrettyPrintedLessComments()             = binaryExprPrettyPrintedLessComments("(%s ./ %s)");
+    eq ELDivExpr.getPrettyPrintedLessComments()            = binaryExprPrettyPrintedLessComments("(%s .\\ %s)");
+    eq EPowExpr.getPrettyPrintedLessComments()             = binaryExprPrettyPrintedLessComments("(%s .^ %s)");
+    eq AndExpr.getPrettyPrintedLessComments()              = binaryExprPrettyPrintedLessComments("(%s & %s)");
+    eq OrExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s | %s)");
+    eq ShortCircuitAndExpr.getPrettyPrintedLessComments()  = binaryExprPrettyPrintedLessComments("(%s && %s)");
+    eq ShortCircuitOrExpr.getPrettyPrintedLessComments()   = binaryExprPrettyPrintedLessComments("(%s || %s)");
+    eq LTExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s < %s)");
+    eq GTExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s > %s)");
+    eq LEExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s <= %s)");
+    eq GEExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s >= %s)");
+    eq EQExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s == %s)");
+    eq NEExpr.getPrettyPrintedLessComments()               = binaryExprPrettyPrintedLessComments("(%s ~= %s)");
+
+    eq RangeExpr.getPrettyPrintedLessComments() {
+        if (hasIncr()) {
+            return String.format("(%s : %s : %s)",
+                getLower().getPrettyPrintedLessComments(),
+                getIncr().getPrettyPrintedLessComments(),
+                getUpper().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("(%s : %s)",
+                getLower().getPrettyPrintedLessComments(),
+                getUpper().getPrettyPrintedLessComments()
+            );
+        }
+    }
+    eq ColonExpr.getPrettyPrintedLessComments()            = ":";
+    eq EndExpr.getPrettyPrintedLessComments()              = "end";
+    eq FunctionHandleExpr.getPrettyPrintedLessComments()   = String.format("@%s", getName().getPrettyPrintedLessComments());
+    eq LambdaExpr.getPrettyPrintedLessComments()           = String.format("@(%s) %s", prettyPrintJoinByDelimiter(", ", getInputParamList()), getBody().getPrettyPrintedLessComments());
+    eq CellArrayExpr.getPrettyPrintedLessComments()        = String.format("{%s}", prettyPrintJoinByDelimiter("; ", getRowList()));
+    eq SuperClassMethodExpr.getPrettyPrintedLessComments() = String.format("%s@%s", getFuncName().getPrettyPrintedLessComments(), getClassName().getPrettyPrintedLessComments());
+
+    protected String HelpComment.getPrettyPrinted(boolean withComment) {
+        return (withComment)?(getText()):"";
+    }
+    eq OneLineHelpComment.getPrettyPrintedLessComments()   = getPrettyPrinted(false);
+    eq OneLineHelpComment.getPrettyPrinted()               = getIndent() + ((getParent() instanceof Program)?"":INDENT_TAB) + getPrettyPrinted(true);
+    eq MultiLineHelpComment.getPrettyPrintedLessComments() = getPrettyPrinted(false);
+    eq MultiLineHelpComment.getPrettyPrinted()             = getIndent() + ((getParent() instanceof Program)?"":INDENT_TAB) +getPrettyPrinted(true);
+    eq Name.getPrettyPrintedLessComments()                 = getID();
+
+    /* AspectMATLAB Pretty Print */
+    /* AspectMATLAB Utils */
+    eq TypeSignature.getPrettyPrintedLessComments()        = getType().getPrettyPrintedLessComments();
+    eq DimensionSignature.getPrettyPrintedLessComments()   = String.format("[%s]", prettyPrintJoinByDelimiter(", ", getDimensionList()));
+    eq FullSignature.getPrettyPrintedLessComments()        = String.format("%s %s", getTypeSignature().getPrettyPrintedLessComments(), getDimensionSignature().getPrettyPrintedLessComments());
+    eq Input.getPrettyPrintedLessComments()                = prettyPrintJoinByDelimiter(", ", getFullSignatureList());
+    eq Output.getPrettyPrintedLessComments()               = prettyPrintJoinByDelimiter(", ", getFullSignatureList());
+
+    eq SelectorSimple.getPrettyPrintedLessComments()       = getElement().getPrettyPrintedLessComments();
+    eq SelectorCompound.getPrettyPrintedLessComments()     = String.format("[%s]", prettyPrintJoinByDelimiter(", ", getElementList()));
+
+    /* AspectMATLAB Patterns */
+    eq PatternName.getPrettyPrintedLessComments()          = getName().getPrettyPrintedLessComments();
+    eq PatternGet.getPrettyPrintedLessComments() {
+        if (hasFullSignature()) {
+            return String.format("get(%s : %s)",
+                getIdentifier().getPrettyPrintedLessComments(),
+                getFullSignature().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("get(%s)", getIdentifier().getPrettyPrintedLessComments());
+        }
+    }
+    eq PatternSet.getPrettyPrintedLessComments() {
+        if (hasFullSignature()) {
+            return String.format("set(%s : %s)",
+                getIdentifier().getPrettyPrintedLessComments(),
+                getFullSignature().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("set(%s)", getIdentifier().getPrettyPrintedLessComments());
+        }
+    }
+    eq PatternCall.getPrettyPrintedLessComments()          = String.format("call(%s(%s) : %s)", getIdentifier().getPrettyPrintedLessComments(), getInput().getPrettyPrintedLessComments(), getOutput().getPrettyPrintedLessComments());
+    eq PatternExecution.getPrettyPrintedLessComments()     = String.format("execution(%s(%s) : %s)", getIdentifier().getPrettyPrintedLessComments(), getInput().getPrettyPrintedLessComments(), getOutput().getPrettyPrintedLessComments());
+    eq PatternMainExecution.getPrettyPrintedLessComments() = "mainexecution()";
+    eq PatternLoop.getPrettyPrintedLessComments() {
+        if (hasType()) {
+            return String.format("loop(%s : %s)",
+                getType().getPrettyPrintedLessComments(),
+                getIdentifier().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("loop(%s)", getIdentifier().getPrettyPrintedLessComments());
+        }
+    }
+    eq PatternLoopHead.getPrettyPrintedLessComments() {
+        if (hasType()) {
+            return String.format("loophead(%s : %s)",
+                getType().getPrettyPrintedLessComments(),
+                getIdentifier().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("loophead(%s)", getIdentifier().getPrettyPrintedLessComments());
+        }
+    }
+    eq PatternLoopBody.getPrettyPrintedLessComments() {
+        if (hasType()) {
+            return String.format("loopbody(%s : %s)",
+                getType().getPrettyPrintedLessComments(),
+                getIdentifier().getPrettyPrintedLessComments()
+            );
+        } else {
+            return String.format("loophead(%s)", getIdentifier().getPrettyPrintedLessComments());
+        }
+    }
+    eq PatternAnnotate.getPrettyPrintedLessComments()      = String.format("annotate(%s(%s))", getIdentifier().getPrettyPrintedLessComments(), prettyPrintJoinByDelimiter(", ", getSelectorList()));
+    eq PatternOperator.getPrettyPrintedLessComments()      = String.format("operator(%s : %s)", getType().getPrettyPrintedLessComments(), prettyPrintJoinByDelimiter(", ", getFullSignatureList()));
+    eq PatternWithin.getPrettyPrintedLessComments()        = String.format("within(%s : %s)", getType().getPrettyPrintedLessComments(), getIdentifier().getPrettyPrintedLessComments());
+    eq PatternDimension.getPrettyPrintedLessComments()     = String.format("dimension(%s)", getDimensionSignature().getPrettyPrintedLessComments());
+    eq PatternIsType.getPrettyPrintedLessComments()        = String.format("istype(%s)", getTypeSignature().getPrettyPrintedLessComments());
+
+    /* AspectMATLAB AspectDef */
+    eq Pattern.getPrettyPrintedLessComments()              = getIndent() + String.format("%s : %s;", getName(), getExpr().getPrettyPrintedLessComments());
+    protected final String Patterns.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append("patterns")
+            .append(NEW_LINE);
+        final String patternToString;
+        if (withComments) {
+            patternToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getPatternList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            patternToString = prettyPrintJoinByDelimiter(NEW_LINE, getPatternList());
+        }
+        builder.append(patternToString)
+            .append(patternToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
+    }
+    eq Patterns.getPrettyPrintedLessComments()             = getPrettyPrinted(false);
+    eq Patterns.getPrettyPrinted()                         = getPrettyPrinted(true);
+
+    protected final String Action.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append(String.format("%s : %s %s : (%s)",
+                getName(),
+                getType(),
+                getExpr().getPrettyPrintedLessComments(),
+                prettyPrintJoinByDelimiter(", ", getInputParamList())
+            )).append(NEW_LINE);
+        final String actionToString;
+        if (withComments) {
+            actionToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getNestedFunctionList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            actionToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getStmtList(),
+                getNestedFunctionList()
+            ));
+        }
+        builder.append(actionToString)
+            .append(actionToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
+    }
+    eq Action.getPrettyPrintedLessComments()               = getPrettyPrinted(false);
+    eq Action.getPrettyPrinted()                           = getPrettyPrinted(true);
+
+    private final String Actions.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append("actions")
+            .append(NEW_LINE);
+        final String actionToString;
+        if (withComments) {
+            actionToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getActionList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            actionToString = prettyPrintJoinByDelimiter(NEW_LINE, getActionList());
+        }
+        builder.append(actionToString)
+            .append(actionToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
+    }
+    eq Actions.getPrettyPrintedLessComments()              = getPrettyPrinted(false);
+    eq Actions.getPrettyPrinted()                          = getPrettyPrinted(true);
+
+    private final String AspectDef.getPrettyPrinted(boolean withComments) {
+        StringBuilder builder = new StringBuilder().append(getIndent())
+            .append(String.format("aspect_ %s", getName()))
+            .append(NEW_LINE);
+        final String aspectBodyToString;
+        if (withComments) {
+            aspectBodyToString = prettyPrintJoinByDelimiterWithComment(NEW_LINE, prettyPrintConcatThenSort(
+                getPropertyList(),
+                getMethodList(),
+                getPatternList(),
+                getActionList(),
+                getClassEventList(),
+                getEnumerationList(),
+                getCommentsAsASTNode()
+            ));
+        } else {
+            aspectBodyToString = prettyPrintJoinByDelimiter(NEW_LINE, prettyPrintConcatThenSort(
+                getPropertyList(),
+                getMethodList(),
+                getPatternList(),
+                getActionList(),
+                getClassEventList(),
+                getEnumerationList()
+            ));
+        }
+        builder.append(aspectBodyToString)
+            .append(aspectBodyToString.isEmpty()?"":NEW_LINE)
+            .append(getIndent()).append("end");
+        return builder.toString();
+    }
+    eq AspectDef.getPrettyPrintedLessComments()            = getPrettyPrinted(false);
+    eq AspectDef.getPrettyPrinted()                        = getPrettyPrinted(true);
+
+    /* Pretty Print utilities */
+    protected static String       ASTNode.INDENT_TAB = "  ";
+    protected static final String ASTNode.NEW_LINE   = "\n";
+
+    protected static String ASTNode.prettyPrintJoinByDelimiter(String delimiter, Iterable<? extends ASTNode> nodes) {
+        return StreamSupport.stream(nodes.spliterator(), false)
+            .map(new java.util.function.Function<ASTNode, String>() {
+                @Override
+                public String apply(ASTNode node) {
+                    return node.getPrettyPrintedLessComments();
+                }
+            })
+            .collect(Collectors.joining(delimiter));
+    }
+
+    protected static String ASTNode.prettyPrintJoinByDelimiterWithComment(String delimiter, Iterable<? extends ASTNode> nodes) {
+        return StreamSupport.stream(nodes.spliterator(), false)
+            .map(new java.util.function.Function<ASTNode, String> () {
+                @Override
+                public String apply(ASTNode node) {
+                    return node.getPrettyPrinted();
+                }
+            })
+            .collect(Collectors.joining(delimiter));
+    }
+
+    public static void ASTNode.setIndentTab(String token) {
+        ASTNode.INDENT_TAB = token;
+    }
+
+    syn String ASTNode.getIndent()                         = (getParent() == null)?"":(getParent().getIndent());
+
+    protected String ASTNode.prettyPrintCheckIndent() {
+        if (getParent() == null) return "";
+        if (getParent() instanceof Program) return "";
+        if (getParent() instanceof ast.List && getParent().getParent() instanceof Program) return "";
+        if (getParent() instanceof ast.ForStmt && ((ast.ForStmt) getParent()).getAssignStmt() == this) return "";
+        return getParent().getIndent() + INDENT_TAB;
+    }
+    eq Stmt.getIndent()                                    = prettyPrintCheckIndent();
+
+    eq Function.getIndent()                                = prettyPrintCheckIndent();
+    eq PropertyAccess.getIndent()                          = prettyPrintCheckIndent();
+    eq Signature.getIndent()                               = prettyPrintCheckIndent();
+    eq PropertyAccessSignature.getIndent()                 = prettyPrintCheckIndent();
+
+    eq Property.getIndent()                                = prettyPrintCheckIndent();
+    eq Event.getIndent()                                   = prettyPrintCheckIndent();
+    eq Enumeration.getIndent()                             = prettyPrintCheckIndent();
+
+    eq Pattern.getIndent()                                 = prettyPrintCheckIndent();
+    eq Action.getIndent()                                  = prettyPrintCheckIndent();
+
+    protected static java.util.List<ASTNode> ASTNode.prettyPrintSortByRelativeIndex(Iterable<? extends ASTNode> nodes) {
+        return StreamSupport.stream(nodes.spliterator(), false)
+            .sorted(new Comparator<ASTNode>() {
+                @Override
+                public int compare(ASTNode nodeA, ASTNode nodeB) {
+                    return nodeA.getRelativeChildIndex() - nodeB.getRelativeChildIndex();
+                }
+            })
+            .collect(Collectors.toList());
+    }
+
+    protected static java.util.List<ASTNode> ASTNode.prettyPrintConcatThenSort(Iterable<? extends ASTNode>... listIteration) {
+        Stream<ASTNode> stream = Stream.empty();
+        for (Iterable<? extends ASTNode> list : listIteration) {
+            stream = Stream.concat(
+                stream,
+                StreamSupport.stream(list.spliterator(), false)
+            );
+        }
+        return prettyPrintSortByRelativeIndex(stream.collect(Collectors.toList()));
+    }
+
+    protected java.util.List<ASTNode> ASTNode.getCommentsAsASTNode() {
+        final ASTNode parentAST = this;
+        return getComments().stream().map(new java.util.function.Function<beaver.Symbol, HelpComment>(){
+            @Override
+            public HelpComment apply(beaver.Symbol symbol) {
+                HelpComment retComment = (HelpComment) symbol;
+                retComment.setParent(parentAST);
+                return retComment;
+            }
+        }).collect(Collectors.toList());
+    }
 }
