@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import ast.ASTNode;
+import AST.ASTNode;
 
 import com.google.common.collect.TreeTraverser;
 
