@@ -66,11 +66,13 @@ public abstract class AbstractSimplification extends AbstractLocalRewrite
 
     public boolean isVar( Expr expr )
     {
-      if (!(expr instanceof NameExpr)) {
+
+        if (!(expr instanceof NameExpr)) {
         return false;
       }
       NameExpr nameExpr = (NameExpr)expr;
-      if( nameExpr.tmpVar ) {
+
+    if( nameExpr.tmpVar ) {
         return true;
       }
       if (!kindAnalysis.getFlowSets().containsKey(nameExpr.getName())) {

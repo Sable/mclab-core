@@ -59,17 +59,15 @@ public class BasicTamerTool {
 		List<AggrValue<BasicMatrixValue>> inputValues = getListOfInputValues(args);
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
 
-		if (doVarRename)
-			callgraph = RenameTypeConflictVars
-					.renameConflictVarsInDifferentWebs(callgraph, inputValues);
+//		if (doVarRename)
+//			callgraph = RenameTypeConflictVars
+//					.renameConflictVarsInDifferentWebs(callgraph, inputValues);
 
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 				callgraph, Args.newInstance(inputValues), factory);
 
-		if (doIntOk)
-			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
-
-		// TODO: Add a fixed point solver to repeat IntOk and VarRenaming.
+//		if (doIntOk)
+//			analysis = IntOkAnalysis.analyzeForIntOk(callgraph, inputValues);
 
 		return analysis;
 	}
@@ -111,7 +109,6 @@ public class BasicTamerTool {
 		ValueFactory<AggrValue<BasicMatrixValue>> factory = new BasicMatrixValueFactory();
 		ValueAnalysis<AggrValue<BasicMatrixValue>> analysis = new ValueAnalysis<AggrValue<BasicMatrixValue>>(
 				callgraph, Args.newInstance(inputValues), factory);
-		System.out.println(analysis.toString());
 
 		for (int i = 0; i < analysis.getNodeList().size(); i++) {
 			System.out.println(ValueAnalysisPrinter.prettyPrint(analysis

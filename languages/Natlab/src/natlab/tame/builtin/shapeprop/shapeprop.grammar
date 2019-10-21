@@ -1,22 +1,23 @@
 %package "natlab.tame.builtin.shapeprop";
 %import "natlab.tame.builtin.shapeprop.ast.*";
+%import "natlab.tame.builtin.shapeprop.mathmode.SPMathMode";
 %import "java.util.*";
 %class "ShapePropParser";
 
 
-%terminals NUMBER, ID, UPPERCASE, LOWERCASE, SCALAR, ANY;
+%terminals NUMBER, ID, UPPERCASE, LOWERCASE, SCALAR, ANY, BLANK, MATHEXPR;
 %terminals OROR, ARROW, COMMA, LRPAREN, RRPAREN, QUESTION, MULT, PLUS, LSPAREN, RSPAREN, OR, EQUAL, SQUOTATION;
 
 %left  OR, EQUAL, RSPAREN, SQUOTATION;
 %left  COMMA;
 %left  RRPAREN;
-%left  PLUS, MULT, QUESTION;
+%left  PLUS,MULT,QUESTION;
 %left  ARROW;
 %left  OROR;
 
 
 %typeof NUMBER = "Number";
-%typeof ID, UPPERCASE, LOWERCASE, SCALAR, ANY = "String";
+%typeof ID, UPPERCASE, LOWERCASE, SCALAR, ANY, MATHEXPR = "String";
 %typeof caselist = "SPCaselist";
 %typeof case = "SPCase";
 %typeof outputlist = "SPOutputlist";
@@ -30,7 +31,6 @@
 %typeof assignStmt = "SPAssignStmt";
 %typeof arg, assignmentLHS, assignmentRHS = "SPAbstractMatchElement";
 %typeof funCall = "SPFunCall";
-
 
 %goal caselist;
 
@@ -46,6 +46,7 @@ case
 outputlist
     = vectorExpr.v                            {: return new SPOutputlist(v, null); :}
     | vectorExpr.v COMMA outputlist.o         {: return new SPOutputlist(v, o); :}
+    | funCall.c                              {: return new SPOutputlist(new SPOutputFunCall(c),null); :}
     ;
     
 patternlist 
@@ -79,6 +80,7 @@ vectorExpr
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
     | ANY.a                                   {: return new SPAny(a); :}
     | vertcatExpr.v                           {: return v; :}  /* used to match a vertcat vector, something like [m,n], [1,k] or even []. */
+    | BLANK                                   {: return new SPBlank(); :}
     ;
     
 vertcatExpr
@@ -99,19 +101,20 @@ arg
 scalarExpr
     = NUMBER.n                                {: return new SPNumber(n); :}
     | LOWERCASE.l                             {: return new SPLowercase(l); :}
+    | MATHEXPR.e                              {: return new SPMathMode(e); :}
     ;
 
 assignStmt
     = assignmentLHS.l EQUAL assignmentRHS.r   {: return new SPAssignStmt(l, r); :}
     ;
-    
 assignmentLHS
     = LOWERCASE.l                             {: return new SPLowercase(l); :}
     | UPPERCASE.u                             {: return new SPUppercase(u); :}
     | UPPERCASE.u LRPAREN scalarExpr.s RRPAREN{: return new SPUpperIndex(u, s); :}
     | ANY.a LRPAREN scalarExpr.s RRPAREN      {: return new SPUpperIndex(a, s); :}
     ;
-    
+
+// (dherre3) modified to have a math mode which assumes all names in space are defined
 assignmentRHS
     = scalarExpr.s                            {: return s; :}
     | vectorExpr.v                            {: return v; :}

@@ -43,6 +43,7 @@ public class BasicMatrixValuePropagator extends
 	
 	public BasicMatrixValuePropagator() {
 		super(new BasicMatrixValueFactory());
+
 	}
 	
 	@Override
@@ -65,17 +66,14 @@ public class BasicMatrixValuePropagator extends
 			return Res.newErrorResult(builtin.getName()
 					+ " is not defined for arguments " + arg + "as class");
 		}
-
 		// if mclass propagation success, do shape propagation.
 		List<Shape> matchShapeResult = builtin.visit(shapeProp, arg);
 		if (Debug) System.out.println("shapeProp result: " + matchShapeResult);
-		
 		// range value propagation
 		RangeValue rangeValueResult = builtin.visit(rangeValueProp, arg);
-		
+
 		// iscomplexInfo propagation
 		List<isComplexInfo> iscomplexResult = builtin.visit(iscomplexProp, arg);
-		
 		return matchResultToRes(matchClassResult, matchShapeResult, rangeValueResult, iscomplexResult);
 
 	}
@@ -112,7 +110,7 @@ public class BasicMatrixValuePropagator extends
 							, (PrimitiveClassReference)classRef
 							, matchShapeResult.get(counter)
 							, rangeValueResult
-							, iscomplexResult.get(0)
+							, (iscomplexResult.isEmpty())?null:iscomplexResult.get(0)
 							));
 				}
 				result.add(ValueSet.newInstance(map));
@@ -129,7 +127,7 @@ public class BasicMatrixValuePropagator extends
 							, (PrimitiveClassReference)classRef
 							, null
 							, rangeValueResult
-							, iscomplexResult.get(0)
+							, (iscomplexResult.size()>0)? iscomplexResult.get(0):null
 							));
 				}
 				result.add(ValueSet.newInstance(map));
@@ -152,7 +150,7 @@ public class BasicMatrixValuePropagator extends
 			System.out.println("shape results for caseAbstractConcatenation are " + matchShapeResult);
 		// iscomplex propagation
 		List<isComplexInfo> iscomplexResult = builtin.visit(iscomplexProp, arg);
-		
+
 		Res<AggrValue<BasicMatrixValue>> result = Res.newInstance();
 		if (matchShapeResult != null) {
 			for (int counter = 0; counter < matchShapeResult.size(); counter++) {
@@ -164,7 +162,7 @@ public class BasicMatrixValuePropagator extends
 						, (PrimitiveClassReference)getDominantCatArgClass(arg)
 						, matchShapeResult.get(counter)
 						, null
-						, iscomplexResult.get(0)
+						, (iscomplexResult.isEmpty())?null:iscomplexResult.get(0)
 						));
 				result.add(ValueSet.newInstance(map));
 			}
@@ -179,7 +177,7 @@ public class BasicMatrixValuePropagator extends
 					, (PrimitiveClassReference)getDominantCatArgClass(arg)
 					, null
 					, null
-					, iscomplexResult.get(0)
+					, (iscomplexResult.isEmpty())?null:iscomplexResult.get(0)
 					));
 			result.add(ValueSet.newInstance(map));
 			return result;

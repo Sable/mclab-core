@@ -80,12 +80,12 @@ public class SPUppercase<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;
 						}
-						else if (argumentShape.maybeVector() && !previousShape.maybeVector()) {
+						else if (argumentShape.maybeScalarOrVector() && !previousShape.maybeScalarOrVector()) {
 							if (Debug) System.err.println("arguments don't have the same shape, go to next case.");
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;
 						}
-						else if (!argumentShape.maybeVector() && previousShape.maybeVector()) {
+						else if (!argumentShape.maybeScalarOrVector() && previousShape.maybeScalarOrVector()) {
 							if (Debug) System.err.println("arguments don't have the same shape, go to next case.");
 							previousMatchResult.setIsError(true);
 							return previousMatchResult;

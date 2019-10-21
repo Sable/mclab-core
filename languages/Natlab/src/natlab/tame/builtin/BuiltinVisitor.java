@@ -626,4 +626,7 @@ public abstract class BuiltinVisitor<Arg,Ret> {
     //at least variance should be a builtin, std = sqrt(var)
     public Ret caseVar(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
     public Ret caseStd(Builtin builtin,Arg arg){ return caseAbstractNotABuiltin(builtin,arg); }
+    public  Ret caseIscolumn(Builtin builtin, Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
+    public  Ret caseIsrow(Builtin builtin, Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
+    public  Ret caseIsmatrix(Builtin builtin, Arg arg){ return caseAbstractScalarLogicalShapeQuery(builtin,arg); }
 }

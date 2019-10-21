@@ -116,6 +116,13 @@ public class InterproceduralAnalysisNode<F extends FunctionAnalysis<A, R>, A, R>
 	}
 
 	/**
+	 * Returns the ValueAnalysis Arguments to the function
+	 * @return Returns the ValueAnalysis Arguments to the function
+	 */
+	public A getArgument(){
+		return argument;
+	}
+	/**
 	 * the same as the other analyze function, except the call object gets
 	 * created within the funciton call
 	 */

@@ -4,8 +4,11 @@ import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 public class SPArglist<V extends Value<V>> extends SPNode<V> {
-	
+
 	SPAbstractMatchElement<V> first;
 	SPArglist<V> next;
 	
@@ -22,7 +25,8 @@ public class SPArglist<V extends Value<V>> extends SPNode<V> {
 		}
 		return matchResult;
 	}
-	
+
+
 	public String toString() {
 		return first.toString() + (next==null? "" : ","+next);
 	}

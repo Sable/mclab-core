@@ -1,16 +1,22 @@
 package natlab.tame.valueanalysis.components.shape;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import natlab.tame.builtin.Builtin;
 import natlab.tame.builtin.BuiltinVisitor;
 import natlab.tame.builtin.shapeprop.HasShapePropagationInfo;
 import natlab.tame.builtin.shapeprop.ShapePropTool;
+import natlab.tame.builtin.shapeprop.ast.SPNode;
+import natlab.tame.valueanalysis.components.constant.DoubleConstant;
+import natlab.tame.valueanalysis.components.constant.HasConstant;
 import natlab.tame.valueanalysis.components.rangeValue.HasRangeValue;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.ColonValue;
 import natlab.tame.valueanalysis.value.Value;
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * this is a singleton class -- make it singleton, ignore all the generic stuff.
@@ -40,10 +46,11 @@ public class ShapePropagator<V extends Value<V>>
 		if(builtin instanceof HasShapePropagationInfo){
 			//call shape prop tool
 			ShapePropTool<V> shapePropTool = new ShapePropTool<V>();
-		    @SuppressWarnings({ "unchecked" })
+			@SuppressWarnings({ "unchecked" })
 			List<Shape> result = shapePropTool.matchByValues(
 					((HasShapePropagationInfo<V>)builtin).getShapePropagationInfo()
 					, arg);
+
 			return result;
 		}
 		throw new UnsupportedOperationException();
@@ -52,8 +59,32 @@ public class ShapePropagator<V extends Value<V>>
     /**
      * the shape propagation for loop variable.
      */
-    public Shape forRange(V lower, V upper, V inc) {
-		List<Integer> scalarShape = new ArrayList<Integer>(2);
+	@SuppressWarnings("unchecked")
+	public Shape forRange(V lower, V upper, V inc) {
+//		LinkedList<V> list = new LinkedList<>();
+//		list.add(lower);
+//    	if(inc != null) list.add(inc);
+//		list.add(upper);
+//		// Shape Propagation equation for for i=low:step:high.
+//		Args<V> argsObj = Args.newInstance(1,list);
+//		SPNode shapePropInfo = ShapePropTool.parse(
+//				"[],$,$->[0,0] || $,[],$->[0,0] || $,$,[]->[0,0] || [],[],$->[0,0] "+
+//						"|| $,[],[]->[0,0] || [],$,[]->[0,0]||[],[],[]->[0,0]"+
+//						"|| [],#,#->[0,0] || #,[],#->[0,0] || #,#,[]->[0,0] || [],[],#->[0,0] "+
+//						"|| #,[],[]->[0,0] || [],#,[]->[0,0]"+
+//						"|| [],[]->[0,0] ||$,[]->[0,0]|| [],$->[0,0] || #,[]->[0,0]|| [],#->[0,0]"+
+//						"||$,n=previousScalar(),$,m=previousScalar(),j={select(n>m,0,1)},k={select(j==0,0,1)}->[j,k]"+
+//						"||$,n=previousScalar(),$,m=previousScalar(),$,s=previousScalar()," +
+//                        "j={select((n<s)&&(m>0),1,select((n>s)&&(m<0),1,select(n==s,1,0)))},"+
+//                "k={select((n<s)&&(m>0),1,select((n>s)&&(m<0),1,select(n==s,1,0)))}->[j,k]"
+//		);
+//		ShapePropTool<V> shapePropTool = new ShapePropTool<V>();
+//		List<Shape> result = shapePropTool.matchByValues(
+//				shapePropInfo
+//				, argsObj);
+//
+//		return (result != null)?result.get(0):null; // Only one target shape
+		List<Integer> scalarShape = new ArrayList<>(2);
 		scalarShape.add(1);
 		scalarShape.add(1);
 		return new ShapeFactory().newShapeFromIntegers(scalarShape);
@@ -112,13 +143,24 @@ public class ShapePropagator<V extends Value<V>>
     	if (rhsArrayShape == null) return null;
     	List<DimValue> indexedDimensions = new ArrayList<DimValue>(indices.size());
     	List<DimValue> rhsArrayDimensions = rhsArrayShape.getDimensions();
+		int loopDimSize = indices.size();
     	// first check, array get cannot resize the accessed matrix.
     	if (indices.size() > rhsArrayDimensions.size()) {
-    		System.err.println("indices exceed the array's dimensions, check you code.");
-    		// TODO may need to mark the current flow set as nonviable.
-    		return new ShapeFactory().getOutOfBoundShape();
+    		// Check if all the remaining dimensions are 1,or a colon value. If they are not, then the flow is incorrect.
+    		if(indices.stream().skip(rhsArrayDimensions.size())
+					.allMatch((V val)-> (val instanceof ColonValue) ||
+                            (((HasShape) val).getShape().isScalar() && ((BasicMatrixValue) val).hasShape() &&
+                                    (((HasConstant) val).getConstant() != null) &&
+                                    ((((HasConstant) val).getConstant()).getValue() instanceof Double) &&
+                                    (((DoubleConstant) ((HasConstant) val).getConstant()).getValue().intValue() == 1)))){
+				loopDimSize = rhsArrayDimensions.size();
+			}else{
+				System.err.println("indices exceed the array's dimensions, check your code.");
+				// TODO may need to mark the current flow set as nonviable.
+				return new ShapeFactory().getOutOfBoundShape();
+			}
     	}
-    	for (int i = 0; i < indices.size(); i++) {
+    	for (int i = 0; i < loopDimSize; i++) {
     		int POS = i + 1;
     		/*
     		 * ColonValue extends from SpecialValue which extends from Value, 
@@ -127,30 +169,35 @@ public class ShapePropagator<V extends Value<V>>
     		 * of course, we cannot convert ColonValue to HasShape. as a result, 
     		 * we should deal with ColonValue first.
     		 */
+
     		if (indices.get(i) instanceof ColonValue) {
     			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
+					System.out.println("I am a colon value end");
         			/*
         			 * proceed linear indexing, won't resize the shape of the indexed 
         			 * array, but has to set the dimension of the return shape.
         			 */
     				if (Debug) System.out.println("need to collapse the remaining dimensions");
 					int howManyElementsRemain = rhsArrayShape.getHowManyElements(i);
+
+    				if (howManyElementsRemain == -1)
+    					indexedDimensions.add(new DimValue());
+    				else
+    					indexedDimensions.add(new DimValue(howManyElementsRemain, null));
 					/*
-					 * if only one index, the return shape will be a row, [1,X], so initialize 
+					 * if only one index, the return shape will be a row, [X,1], so initialize
 					 * the first dimension as 1, then add the second dimension.
+					 * (dherre3) modified to fix case where c(:), this is a column vector, not the opposite
 					 */
     				if (indices.size() == 1) indexedDimensions.add(new DimValue(1, null));
-    				if (howManyElementsRemain == -1) 
-    					indexedDimensions.add(new DimValue());
-    				else 
-    					indexedDimensions.add(new DimValue(howManyElementsRemain, null));
     			}
     			else {
-    				/*
+					/*
     				 * the ordinary case.
     				 */
     				indexedDimensions.add(rhsArrayDimensions.get(i).cloneThisValue());
     			}
+
     		}
     		else if (((HasShape)indices.get(i)).getShape().isScalar()) {
     			if (POS == indices.size() && POS < rhsArrayDimensions.size()) {
@@ -230,29 +277,53 @@ public class ShapePropagator<V extends Value<V>>
     				/*
 					 * if only one index, the return shape will be a row, [1,X], so initialize 
 					 * the first dimension as 1, then add the second dimension.
+					 * (dherre3) This is not true, it will return a shape, depending on the shape of both.
+					 * If rhs is a row vector or column vector and the index is a row or column, it will take
+					 * whatever vector shape the rhs has.
+					 * If index is a matrix, or any other shape different from a vector, it will take the shape
+					 * of that matrix.
+					 * If the rhs is a not a vector, and the index is a vector, it will take the shape of the
+					 * input index.
 					 */
-    				if (indices.size() == 1 && rhsArrayDimensions.get(0).hasIntValue() 
-    						&& rhsArrayDimensions.get(0).getIntValue() == 1) {
-    					indexedDimensions.add(new DimValue(1, null));
-        				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape)indices.get(i))
-        						.getShape().getDimensions().get(1));
-    				}
-    				else if (indices.size() == 1 && rhsArrayDimensions.get(1).hasIntValue() 
-    						&& rhsArrayDimensions.get(1).getIntValue() == 1) {
-        				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape)indices.get(i))
-        						.getShape().getDimensions().get(1));
-    					indexedDimensions.add(new DimValue(1, null));
-    				}
-    				else if (indices.size() == 1 
-    						&& ((HasShape)indices.get(0)).getShape().isRowVector()) {
-    					indexedDimensions.add(new DimValue(1, null));
-        				// add the value of the second dimension of the vector to the return shape.
-        				indexedDimensions.add(((HasShape)indices.get(i))
-        						.getShape().getDimensions().get(1));
-    				}
-    				// TODO what if the indices is a column vector
+    				// Two cases, where
+					if(indices.size() == 1){
+						// Case where they are both vectors
+						if(rhsArrayShape.isVector() && ((HasShape)indices.get(0)).getShape().isVector()){
+							int val = (((HasShape)indices.get(i))
+									.getShape().getDimensions().get(1).equalsOne())?
+									((HasShape)indices.get(i))
+											.getShape().getDimensions().get(1).getIntValue():
+									((HasShape)indices.get(i))
+											.getShape().getDimensions().get(0).getIntValue();
+							// Result takes shape of rhs vector with num of elements given by the indices
+							if(rhsArrayShape.isColVector()){
+
+								indexedDimensions.add(new DimValue(val, null));
+								indexedDimensions.add(new DimValue(1, null));
+							}else{
+								indexedDimensions.add(new DimValue(1, null));
+								indexedDimensions.add(new DimValue(val, null));
+							}
+
+						// Case where rhs is not a vector, in this case, or the case where rhs is a vector but
+						// index 0 is a matrix, we take the same shape as the index 0 matrix, we must simply ensure
+						// that rhsArrayShape is a constant, otherwise, we do not know whether it is really not a vector.
+						// Also if we can proof the indices are not vectors, then we may deduce the resulting matrix is a
+						// vector.
+						}else if(rhsArrayShape.isConstant() || !rhsArrayShape.isMatrix()
+								||!((HasShape)indices.get(i)).getShape().isVector()){
+							Shape shape =((HasShape)indices.get(i)).getShape();
+							indexedDimensions.addAll(shape.getDimensions());
+						}else{
+							// TODO: Check ranges,
+							// We have no idea and cannot predict what will happen,
+							// so the rhs may or may not be a vector, which means we do no know in this case.
+							// RHS may be a vector in which case, result takes the size of vector
+							// Or it may be a matrix, in which case it takes the size of the indices.
+							indexedDimensions.add(new DimValue());
+							indexedDimensions.add(new DimValue());
+						}
+					}
     				else {
         				// add the value of the second dimension of the vector to the return shape.
         				indexedDimensions.add(((HasShape)indices.get(i))
@@ -289,8 +360,20 @@ public class ShapePropagator<V extends Value<V>>
         						.getShape().getDimensions().get(0));    					
     				}
     				else {
-    					// TODO what if it's a matrix?
-    					indexedDimensions.add(new DimValue());
+    					// Case: Matrix as an index
+						// If its a matrix and is not the first and only index, get the total number of elements
+						// and make the dimension that size.
+						if(indices.get(i) instanceof HasShape){
+							int numel = ((HasShape)indices.get(i)).getShape().getHowManyElements(0);
+							if(numel != -1){
+								indexedDimensions.add(new DimValue(numel, null));
+							}else{
+								indexedDimensions.add(new DimValue());
+							}
+						}else{
+							indexedDimensions.add(new DimValue());
+						}
+
     				}
     			}
     		}
@@ -321,8 +404,10 @@ public class ShapePropagator<V extends Value<V>>
      * declared as allocatable array in the generated code.
      * 
      * TODO what is the maximum size which an array can be or can be declared?
-     * TODO in matlab array index, there is a keyword "end".
-     * 
+     * TODO in matlab array index, there is a keyword "end". (dherre3) handled in constant propagation
+	 * Basically end is another built-in, we just need special support for that built-in in the
+	 * constant propagation stage.
+     *
      * DONE: Since we cannot assume the input MATLAB code is 100% syntax correct 
      * and safe, we need to consider the situation that if the rhs value's shape 
      * doesn't conform with the lhs indexed array, i.e., we assign a shape of 

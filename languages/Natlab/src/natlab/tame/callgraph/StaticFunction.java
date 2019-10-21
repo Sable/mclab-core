@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 import natlab.tame.simplification.ThreeAddressToIR;
+import natlab.tame.simplification.InputCallSimplification;
+
 import natlab.tame.tir.TIRFunction;
 import natlab.toolkits.Context;
 import natlab.toolkits.analysis.varorfun.VFDatum;
@@ -141,7 +143,9 @@ public class StaticFunction implements Cloneable {
                 VFPreorderAnalysis anal = new VFPreorderAnalysis(function);
                 function = (Function)new CommentSimplification(function, anal).transform();
                 anal = new VFPreorderAnalysis(function);
-                function = (Function)new ThreeAddressToIR(function,anal).transform();
+//                function = (Function)new ThreeAddressToIR(function,anal).transform();
+                function = (Function)new InputCallSimplification(function,anal).transform();
+
             } else {
                 applySimplification(CommentSimplification.class);
                 applySimplification(ThreeAddressToIR.class);

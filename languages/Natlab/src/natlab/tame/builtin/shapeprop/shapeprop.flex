@@ -37,7 +37,7 @@ Number = -? [:digit:] [:digit:]*
 Identifier = [:jletter:] [:jletterdigit:]+
 Uppercase = [A-Z]
 Lowercase = [a-z]
-
+MathString = \{ [^}]* \}
 %%
 
 {WhiteSpace}+   { /* ignore */ }
@@ -47,6 +47,7 @@ Lowercase = [a-z]
 	{Identifier} { return newToken(Terminals.ID,        new String(yytext())); }
 	{Uppercase}  { return newToken(Terminals.UPPERCASE, new String(yytext())); }
 	{Lowercase}  { return newToken(Terminals.LOWERCASE, new String(yytext())); }
+	{MathString}  { return newToken(Terminals.MATHEXPR, new String(yytext())); }
 	"$"          { return newToken(Terminals.SCALAR,    yytext()); }
 	"#"          { return newToken(Terminals.ANY,       yytext()); }
 	"||"         { return newToken(Terminals.OROR,      yytext()); }
@@ -61,7 +62,7 @@ Lowercase = [a-z]
 	"["          { return newToken(Terminals.LSPAREN,   yytext()); }
 	"]"          { return newToken(Terminals.RSPAREN,   yytext()); }
 	"|"          { return newToken(Terminals.OR,        yytext()); }
-	"'"          { return newToken(Terminals.SQUOTATION,yytext()); }
+    "_"          { return newToken(Terminals.BLANK,     yytext()); }
 }
 
 .|\n            { throw new Scanner.Exception("unexpected character '" + yytext() + "'"); }

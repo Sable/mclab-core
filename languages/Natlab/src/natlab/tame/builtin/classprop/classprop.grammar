@@ -30,7 +30,7 @@ cases
     
 expr 
 	= clause.a ARROW clause.b           {: return new CPMap   (a, b); :}
-	| expr.a   OROR expr.b              {: return new CPUnion (a, b); :}
+	| expr.a   OROR  expr.b             {: return new CPUnion (a, b); :}
 	| clause
 	;
 

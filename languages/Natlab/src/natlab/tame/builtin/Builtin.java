@@ -21,13 +21,6 @@ import natlab.toolkits.path.BuiltinQuery;
 
 public abstract class Builtin {
     private static HashMap<String, Builtin> builtinMap = new HashMap<String, Builtin>();
-    public static void main(String[] args) {
-        java.lang.System.out.println(getInstance("i"));
-        Builtin b = builtinMap.get("i");
-        java.lang.System.out.println(b);
-        java.lang.System.out.println("number of builtins "+builtinMap.size());
-        java.lang.System.out.println(builtinMap);
-    }
 
     /**
      * returns the builtin from the given name (case sensitive)
@@ -285,6 +278,9 @@ public abstract class Builtin {
         builtinMap.put("isempty",Isempty.getInstance());
         builtinMap.put("isvector",Isvector.getInstance());
         builtinMap.put("isscalar",Isscalar.getInstance());
+        builtinMap.put("ismatrix",Ismatrix.getInstance());
+        builtinMap.put("iscolumn",Iscolumn.getInstance());
+        builtinMap.put("isrow",Isrow.getInstance());
         builtinMap.put("isequalwithequalnans",Isequalwithequalnans.getInstance());
         builtinMap.put("isequal",Isequal.getInstance());
         builtinMap.put("reshape",Reshape.getInstance());
@@ -418,7 +414,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$");
+                shapePropInfo = ShapePropTool.parse("_->$");
             }
             return shapePropInfo;
         }
@@ -2940,14 +2936,25 @@ public abstract class Builtin {
         }
         
     }
-    public static abstract class AbstractDimensionCollapsingFloatFunction extends AbstractDimensionSensitiveFloatFunction  {
+    public static abstract class AbstractDimensionCollapsingFloatFunction extends AbstractDimensionSensitiveFloatFunction  implements HasShapePropagationInfo  {
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractDimensionCollapsingFloatFunction(this,arg);
         }
-        
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse(
+                        " $,$ -> $"+
+                                "|| $ -> $"+
+                                "|| ([1,n]|[n,1]) -> $" +
+                                "|| ([1,n]|[n,1]) -> $");
+            }
+            return shapePropInfo;
+        }
     }
-    public static class Mode extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo {
+    public static class Mode extends AbstractDimensionCollapsingFloatFunction {
         //returns the singleton instance of this class
         private static Mode singleton = null;
         public static Mode getInstance(){
@@ -2973,7 +2980,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Prod extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo {
+    public static class Prod extends AbstractDimensionCollapsingFloatFunction {
         //returns the singleton instance of this class
         private static Prod singleton = null;
         public static Prod getInstance(){
@@ -2989,17 +2996,10 @@ public abstract class Builtin {
             return "prod";
         }
         
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M");
-            }
-            return shapePropInfo;
-        }
+
 
     }
-    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
+    public static class Sum extends AbstractDimensionCollapsingFloatFunction implements  HasClassPropagationInfo, HasisComplexPropagationInfo {
         //returns the singleton instance of this class
         private static Sum singleton = null;
         public static Sum getInstance(){
@@ -3015,14 +3015,7 @@ public abstract class Builtin {
             return "sum";
         }
         
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1],('double'|'native')?->$||M,M(1)=1,('double'|'native')?->M||M,$,n=previousScalar(),M(n)=1,('double'|'native')?->M");
-            }
-            return shapePropInfo;
-        }
+
 
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
@@ -3049,7 +3042,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements HasShapePropagationInfo, HasClassPropagationInfo {
+    public static class Mean extends AbstractDimensionCollapsingFloatFunction implements  HasClassPropagationInfo {
         //returns the singleton instance of this class
         private static Mean singleton = null;
         public static Mean getInstance(){
@@ -3063,15 +3056,6 @@ public abstract class Builtin {
         //return name of builtin
         public String getName(){
             return "mean";
-        }
-        
-        private SPNode shapePropInfo = null;
-        public SPNode getShapePropagationInfo(){
-            //set shapePropInfo if not defined
-            if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[1,n]|[n,1]->$||M,M(1)=1->M||M,$,n=previousScalar(),M(n)=1->M");
-            }
-            return shapePropInfo;
         }
 
         public CP getMatlabClassPropagationInfo(){{
@@ -4065,7 +4049,18 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]||$,n=previousScalar(),$,i=previousScalar(),$,m=previousScalar(),k=minus(m,n),d=div(k,i)->[1,d]");
+                // Modified by dherre3, need to account for cases where we have empty, to do this, we need to be able
+                // Incorrect production for -2,1,2, -2,-2,1,
+                shapePropInfo = ShapePropTool.parse(
+                        "[],$,$->[1,0] || $,[],$->[1,0] || $,$,[]->[1,0] || [],[],$->[1,0] "+
+                                "|| $,[],[]->[1,0] || [],$,[]->[1,0]||[],[],[]->[1,0]"+
+                                "|| [],#,#->[1,0] || #,[],#->[1,0] || #,#,[]->[1,0] || [],[],#->[1,0] "+
+                                "|| #,[],[]->[1,0] || [],#,[]->[1,0]"+
+                                "|| [],[]->[1,0] ||$,[]->[1,0]|| [],$->[1,0] || #,[]->[1,0]|| [],#->[1,0]"+
+                                "||$,n=previousScalar(),$,m=previousScalar(),k=minus(m,n)->[1,k]" +
+                                "||$,n=previousScalar(),$,i=previousScalar(),$,m=previousScalar(),k=minus(m,n),d=div(k,i)->[1,d]");
+
+//                                "$,n=previousScalar(),$,i=previousScalar(),$,m=previousScalar(),k=minus(m,n),d=div(k,i)->[1,d]");
             }
             return shapePropInfo;
         }
@@ -4114,12 +4109,12 @@ public abstract class Builtin {
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractNumericalByShapeAndTypeMatrixCreation(this,arg);
         }
-        
+
         private SPNode shapePropInfo = null;
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$||($,n=previousScalar(),add())+->M");
+                shapePropInfo = ShapePropTool.parse("_->$||($,n=previousScalar(),add())+->M");
             }
             return shapePropInfo;
         }
@@ -4207,6 +4202,15 @@ public abstract class Builtin {
             if (singleton == null) singleton = new Eye();
             return singleton;
         }
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("_->$||$,n=previousScalar()->[n,n]||$,n=previousScalar(),$,m=previousScalar()->[n,m]" +
+                        " || M,isRowVector(M),h=previousShapeDim(),t=2,isequal_s(h,t)->M");
+            }
+            return shapePropInfo;
+        }
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseEye(this,arg);
@@ -4227,7 +4231,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]|'double'|'single'->$||($,n=previousScalar(),add())+->M");
+                shapePropInfo = ShapePropTool.parse("_|'double'|'single'->$||($,n=previousScalar(),add())+->M|| -> $");
             }
             return shapePropInfo;
         }
@@ -4292,7 +4296,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$||($,n=previousScalar(),add())+->M");
+                shapePropInfo = ShapePropTool.parse("_->$||($,n=previousScalar(),add())+->M");
             }
             return shapePropInfo;
         }
@@ -5335,7 +5339,8 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(1), $|M, $->$||numOutput(2),[m,n]->$,$");
+                shapePropInfo = ShapePropTool.parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(0),$|M,k=previousShapeDim()->[1,k]" +
+                        "||numOutput(1), $|M, $->$ || M|$,k = targetSize()->scalarRowVector(k)");
             }
             return shapePropInfo;
         }
@@ -5438,7 +5443,7 @@ public abstract class Builtin {
         }
 
     }
-    public static class End extends AbstractScalarDoubleResultVersatileQuery implements HasClassPropagationInfo {
+    public static class End extends AbstractScalarDoubleResultVersatileQuery implements HasClassPropagationInfo, HasShapePropagationInfo {
         //returns the singleton instance of this class
         private static End singleton = null;
         public static End getInstance(){
@@ -5453,7 +5458,14 @@ public abstract class Builtin {
         public String getName(){
             return "end";
         }
-        
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("M,$,$,k=previousShapeDim(1)->");
+            }
+            return shapePropInfo;
+        }
         public CP getMatlabClassPropagationInfo(){{
             return getClassPropagationInfo();
         }}
@@ -5470,7 +5482,7 @@ public abstract class Builtin {
         }
 
     }
-    public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo {
+    public static abstract class AbstractLogicalResultVersatileQuery extends AbstractVersatileQuery implements HasClassPropagationInfo, HasShapePropagationInfo{
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractLogicalResultVersatileQuery(this,arg);
@@ -5490,6 +5502,19 @@ public abstract class Builtin {
             }
             return classPropInfo;
         }
+        /**
+         * returns the shape propagation info for the Builtin.
+         */
+
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                shapePropInfo = ShapePropTool.parse("$|M->$");
+            }
+            return shapePropInfo;
+        }
+
 
     }
     public static abstract class AbstractScalarLogicalResultVersatileQuery extends AbstractLogicalResultVersatileQuery  {
@@ -5521,7 +5546,8 @@ public abstract class Builtin {
         public String getName(){
             return "isobject";
         }
-        
+
+
     }
     public static class Isfloat extends AbstractClassQuery  {
         //returns the singleton instance of this class
@@ -5722,6 +5748,7 @@ public abstract class Builtin {
             if (singleton == null) singleton = new Isscalar();
             return singleton;
         }
+
         //visit visitor
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseIsscalar(this,arg);
@@ -5731,6 +5758,57 @@ public abstract class Builtin {
             return "isscalar";
         }
         
+    }
+    public static class Iscolumn extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Iscolumn singleton = null;
+        public static Iscolumn getInstance(){
+            if (singleton == null) singleton = new Iscolumn();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIscolumn(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "iscolumn";
+        }
+
+    }
+    public static class Isrow extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Isrow singleton = null;
+        public static Isrow getInstance(){
+            if (singleton == null) singleton = new Isrow();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsrow(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "isrow";
+        }
+
+    }
+    public static class Ismatrix extends AbstractScalarLogicalShapeQuery  {
+        //returns the singleton instance of this class
+        private static Ismatrix singleton = null;
+        public static Ismatrix getInstance(){
+            if (singleton == null) singleton = new Ismatrix();
+            return singleton;
+        }
+        //visit visitor
+        public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
+            return visitor.caseIsmatrix(this,arg);
+        }
+        //return name of builtin
+        public String getName(){
+            return "ismatrix";
+        }
+
     }
     public static abstract class AbstractMultiaryToScalarLogicalVersatileQuery extends AbstractVersatileQuery implements HasShapePropagationInfo, HasClassPropagationInfo, HasisComplexPropagationInfo {
         //visit visitor
@@ -6002,7 +6080,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->[0,0]||M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K");
+                shapePropInfo = ShapePropTool.parse("_->[0,0] || []->[0,0]||M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=add(k))*,K(2)=n->K");
             }
             return shapePropInfo;
         }
@@ -6037,7 +6115,9 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->[0,0]||M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K");
+                shapePropInfo = ShapePropTool.parse("_->[0,0] || []->[0,0]||M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K");
+
+//                shapePropInfo = ShapePropTool.parse("[]->[0,0]||M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=add(k))*,K(1)=n->K");
             }
             return shapePropInfo;
         }
@@ -6292,7 +6372,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->[1,6]");
+                shapePropInfo = ShapePropTool.parse("_->[1,6]");
             }
             return shapePropInfo;
         }
@@ -6333,7 +6413,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$");
+                shapePropInfo = ShapePropTool.parse("_->$");
             }
             return shapePropInfo;
         }
@@ -6383,7 +6463,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$");
+                shapePropInfo = ShapePropTool.parse("_->$");
             }
             return shapePropInfo;
         }
@@ -6456,7 +6536,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("#->[]");
+                shapePropInfo = ShapePropTool.parse("#->_");
             }
             return shapePropInfo;
         }
@@ -6904,7 +6984,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("#->[]");
+                shapePropInfo = ShapePropTool.parse("#->_");
             }
             return shapePropInfo;
         }
@@ -7159,7 +7239,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("[]->$||($,n=previousScalar(),add())+->M");
+                shapePropInfo = ShapePropTool.parse("_->$||($,n=previousScalar(),add())+->M");
             }
             return shapePropInfo;
         }
@@ -7433,7 +7513,7 @@ public abstract class Builtin {
         public SPNode getShapePropagationInfo(){
             //set shapePropInfo if not defined
             if (shapePropInfo == null){
-                shapePropInfo = ShapePropTool.parse("#->[]");
+                shapePropInfo = ShapePropTool.parse("#->_");
             }
             return shapePropInfo;
         }

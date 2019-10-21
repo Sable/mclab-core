@@ -206,6 +206,9 @@ public class BuiltinSet {
 		builtinSet.add("isempty");
 		builtinSet.add("isvector");
 		builtinSet.add("isscalar");
+		builtinSet.add("isrow");
+		builtinSet.add("iscolumn");
+		builtinSet.add("ismatrix");
 		builtinSet.add("isequalwithequalnans");
 		builtinSet.add("isequal");
 		builtinSet.add("reshape");

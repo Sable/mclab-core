@@ -15,10 +15,6 @@ extends InterproceduralAnalysis<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>>{
 
     public ValueAnalysis(SimpleFunctionCollection callgraph, Args<V> mainArgs, ValueFactory<V> valueFactory) {
         super(new Factory<V>(valueFactory), callgraph, mainArgs);
-        
-       
-      
-        
     }
     
 

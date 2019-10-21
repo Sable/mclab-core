@@ -334,21 +334,21 @@ public class ThreeAddressToIR extends AbstractSimplification {
         }
         return list;
     }
-    
-    
+
+
     private AssignStmt transformAssignment(AssignStmt node, LinkedList<AssignStmt> assignments){
         //TODO - collect lhs as matrix in general
         //ArraySet - lhs a parameterized var
         if (isParameterizedVar(node.getLHS())){
             ParameterizedExpr param = (ParameterizedExpr)(node.getLHS());
             node.setRHS(expandExpr(node.getRHS(),assignments));
-            node = new TIRArraySetStmt(((NameExpr)(param.getTarget())).getName(), 
+            node = new TIRArraySetStmt(((NameExpr)(param.getTarget())).getName(),
                     listToCommaSeparatedList(param.getArgList(), assignments, true), ((NameExpr)node.getRHS()).getName());
         //CellArraySet
         } else if (node.getLHS() instanceof CellIndexExpr) {
             CellIndexExpr cell = (CellIndexExpr)(node.getLHS());
             node.setRHS(expandExpr(node.getRHS(), assignments));
-            node = new TIRCellArraySetStmt(((NameExpr)(cell.getTarget())).getName(), 
+            node = new TIRCellArraySetStmt(((NameExpr)(cell.getTarget())).getName(),
                     listToCommaSeparatedList(cell.getArgList(), assignments, true), ((NameExpr)node.getRHS()).getName());
         //DotArraySet
         } else if (node.getLHS() instanceof DotExpr) {
@@ -357,9 +357,10 @@ public class ThreeAddressToIR extends AbstractSimplification {
             node = new TIRDotSetStmt(
                     ((NameExpr)dot.getTarget()).getName(),dot.getField(),
                     ((NameExpr)node.getRHS()).getName());
-            
+
         //there can only be one or more vars on the left hand side
         } else {
+
             //ArrayGet - rhs is a parametrized var
             if (isParameterizedVar(node.getRHS())){
                 ParameterizedExpr param = (ParameterizedExpr)node.getRHS();
@@ -629,7 +630,7 @@ public class ThreeAddressToIR extends AbstractSimplification {
      */
     private boolean isCall(Expr expr){
         if (expr instanceof ParameterizedExpr){
-            return !isVar((NameExpr)((ParameterizedExpr)expr).getTarget());
+            return !isVar((NameExpr)((ParameterizedExpr) expr).getTarget());
         } else if (expr instanceof NameExpr){
             return !isVar((NameExpr)expr);
         }

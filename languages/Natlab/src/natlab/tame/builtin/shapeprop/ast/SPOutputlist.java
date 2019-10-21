@@ -5,7 +5,7 @@ import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
 
 public class SPOutputlist<V extends Value<V>> extends SPNode<V> {
-	
+
 	static boolean Debug = false;
 	SPAbstractVectorExpr<V> first;
 	SPOutputlist<V> next;

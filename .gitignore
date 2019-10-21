@@ -1,4 +1,5 @@
 *.class
+.idea
 bin
 bin-ant
 bin-eclipse
