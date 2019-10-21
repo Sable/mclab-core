@@ -31,6 +31,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 		 *  currently, previousScalar, previousShapeDim, add, minus, div, minimum and copy are functions in assignment;
 		 *  numOutput and isequal are assert functions.
 		 */
+
 		if (funName.equals("previousScalar") && arglist==null) {
 			if (Debug) System.out.println("try to get previous matched scalar's value.");
 			String latestMatchedUppercase = previousMatchResult.getLatestMatchedUppercase();
@@ -39,7 +40,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 				lowercase.put(latestMatchedLowercase, previousMatchResult.getValueOfVariable("$"));
 				ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-	            return matchResult;	
+	            return matchResult;
 			}
 			else{
 				if (Debug) System.err.println("cannot get the value of previous matched Scalar in shape equation.");
@@ -69,8 +70,9 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				String[] arg = arglist.toString().split(",");
 				if (arg.length==1) {
 					ShapePropMatch<V> arglistMatch = arglist.match(isPatternSide, previousMatchResult, argValues, Nargout);
-					if (Debug) System.out.println("try to get the size of the " +arglistMatch.getLatestMatchedNumber() 
+					if (Debug) System.out.println("try to get the size of the " +arglistMatch.getLatestMatchedNumber()
 							+ " dimension of latest matched shape");
+
 					if (arglistMatch.getShapeOfVariable(arglistMatch.getLatestMatchedUppercase())
 							.getDimensions().get(arglistMatch.getLatestMatchedNumber()-1)==null) {
 			            return arglistMatch;
@@ -84,9 +86,56 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			            return matchResult;
 					}
 				}
-				if (Debug) System.err.println("cannot get the size of a certain dimension of a shape in shape equation.");
+				if (Debug) System.err.println("cannot" +
+						" get the size of a certain dimension of a shape in shape equation.");
 				return previousMatchResult;
 			}
+		}else if(funName.equals("targetSize") ){
+			if(previousMatchResult.getIsInsideAssign()){
+                HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+                lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+                        new DimValue(Nargout, null));
+                return new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+			}else{
+				previousMatchResult.setIsError(true);
+				return previousMatchResult;
+			}
+		}else if(funName.equals("scalarRowVector") && !isPatternSide){
+			if(arglist != null){
+				String[] arg = arglist.toString().split(",");
+				if(arg.length == 1){
+					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						for(int i = 0; i <previousMatchResult.getValueOfVariable(arg[0])
+								.getIntValue();i++){
+							previousMatchResult.addToOutput(new ShapeFactory().getScalarShape());
+							previousMatchResult.emitOneResult();
+						}
+						return previousMatchResult;
+					}
+				}
+			}
+			previousMatchResult.setIsError(true);
+			return previousMatchResult;
+		}
+		else if(funName.equals("abs")){
+
+			// Abs. only takes a lower case variable whose value int must be known, if it is not, it will error
+			if(arglist != null){
+				String[] arg = arglist.toString().split(",");
+				if(arg.length == 1){
+					if (previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+								new DimValue(Math.abs(previousMatchResult.getValueOfVariable(arg[0])
+										.getIntValue()), null));
+						return new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+					}
+				}
+			}
+			previousMatchResult.setIsError(true);
+			if (Debug) System.err.println("cannot compute abs() function in shape equation!");
+			return previousMatchResult;
 		}
 		/*
 		 * add function is used in two situations, one for adding the value of previous matched scalar to vertcat, 
@@ -103,19 +152,36 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				else {
 					previousMatchResult.addToVertcatExpr(new DimValue());
 					return previousMatchResult;
-				}				
+				}
+
 			}
 			else {
 				String[] arg = arglist.toString().split("'");
 				if (arg.length==1) {
+					try{
+						Integer valueToAdd = Integer.parseInt(arg[0]);
+						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
+						if(previousMatchResult.getValueOfVariable(previousMatchResult.
+								getLatestMatchedLowercase()).hasIntValue()){
+							int sum = previousMatchResult.getValueOfVariable(previousMatchResult.
+									getLatestMatchedLowercase()).getIntValue()
+									+ valueToAdd;
+							lowercase.put(previousMatchResult.getLatestMatchedLowercase(),
+									new DimValue(sum, null));
+
+							return new ShapePropMatch<V>(previousMatchResult, lowercase, null);
+						}
+					}catch (NumberFormatException ex){
+						if(Debug)System.err.println("Value inside add is not an integer, continuing to match variables");
+					}
+
 					if (previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).hasIntValue() 
 							&& previousMatchResult.getValueOfVariable(arg[0]).hasIntValue()) {
 						HashMap<String, DimValue> lowercase = new HashMap<String, DimValue>();
 						int sum = previousMatchResult.getValueOfVariable(previousMatchResult.getLatestMatchedLowercase()).getIntValue() 
 								+ previousMatchResult.getValueOfVariable(arg[0]).getIntValue();
 						lowercase.put(previousMatchResult.getLatestMatchedLowercase(), new DimValue(sum, null));
-						ShapePropMatch<V> matchResult = new ShapePropMatch<V>(previousMatchResult, lowercase, null);
-						return matchResult;
+						return new ShapePropMatch<V>(previousMatchResult, lowercase, null);
 					}
 					/*
 					 * add symbolic expression here.
@@ -281,6 +347,7 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			if (Debug) System.err.println("check your shape equation language for using copy() function.");
 			return previousMatchResult;
 		}
+
 		else if (funName.equals("numOutput") && arglist!=null) {
 			String[] arg = arglist.toString().split(",");
 			if (arg.length==1) {
@@ -299,6 +366,23 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 				Shape first = previousMatchResult.getShapeOfVariable(arg[0]);
 				Shape second = previousMatchResult.getShapeOfVariable(arg[1]);
 				if (first.equals(second)) return previousMatchResult;
+			}
+			previousMatchResult.setIsError(true);
+			if (Debug) System.err.println("two shapes are not equal.");
+			return previousMatchResult;
+		}
+		else if (funName.equals("isequal_s") && arglist!=null) {
+			String[] arg = arglist.toString().split(",");
+			if (arg.length==2) {
+				if (Debug) System.out.println("comparing two scalar variables: "+arg[0]+" and, "+arg[1]);
+				try{
+					int first = previousMatchResult.getValueOfVariable(arg[0]).getIntValue();
+					int second = previousMatchResult.getValueOfVariable(arg[1]).getIntValue();
+					if(first == second) return previousMatchResult;
+				}catch (Exception err){
+					previousMatchResult.setIsError(true);
+					return previousMatchResult;
+				}
 			}
 			previousMatchResult.setIsError(true);
 			if (Debug) System.err.println("two shapes are not equal.");
@@ -332,10 +416,26 @@ public class SPFunCall<V extends Value<V>> extends SPAbstractMatchElement<V> {
 			previousMatchResult.setIsError(true);
 			if (Debug) System.err.println("cannot confirm whether latest matched not less than " + arg[0]);
 			return previousMatchResult;
-		}
-		else {
+		}else if(funName.equals("isRowVector") && arglist!=null){
+			String[] arg = arglist.toString().split(",");
+			if(arg.length == 1){
+				Shape first = previousMatchResult.getShapeOfVariable(arg[0]);
+				if(first!=null && first.isRowVector()){
+					return previousMatchResult;
+				}else{
+					if(Debug) System.err.println("Cannot confirm whether input vector is RowVector for shape: "+
+						first);
+					previousMatchResult.setIsError(true);
+					return previousMatchResult;
+				}
+			}else{
+				previousMatchResult.setIsError(true);
+			}
+			return previousMatchResult;
+		}else {
 			if (Debug) System.err.println("cannot find the function " + funName + "(" + (arglist==null? "" : arglist.toString()) 
 					+ "), check your shape equation in builtins.csv file!");
+			previousMatchResult.setIsError(true);
 			return previousMatchResult;
 		}
 	}

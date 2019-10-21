@@ -1,0 +1,64 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
+/**
+ * returns, for all operators, the name of the associated function they have in matlab
+ */
+
+aspect OperatorNames{
+    /**
+     * Returns the name of the matlab function which is associated with the operator as a String.
+     */
+    syn String BinaryExpr.getOperatorName(){ return ""; }
+    
+    syn String PlusExpr.getOperatorName(){ return "plus"; }
+    syn String MinusExpr.getOperatorName(){ return "minus"; }
+
+    syn String MTimesExpr.getOperatorName(){ return "mtimes"; }
+    syn String MDivExpr.getOperatorName(){ return "mrdivide"; }
+    syn String MLDivExpr.getOperatorName(){ return "mldivide"; }
+    syn String MPowExpr.getOperatorName(){ return "mpower"; }
+
+    syn String ETimesExpr.getOperatorName(){ return "times"; }
+    syn String EDivExpr.getOperatorName(){ return "rdivide"; }
+    syn String ELDivExpr.getOperatorName(){ return "ldivide"; }
+    syn String EPowExpr.getOperatorName(){ return "power"; }
+
+    syn String AndExpr.getOperatorName(){ return "and"; }
+    syn String OrExpr.getOperatorName(){ return "or"; }
+
+    syn String ShortCircuitAndExpr.getOperatorName(){ return "ShortCuircitAnd"; }
+    syn String ShortCircuitOrExpr.getOperatorName(){ return "ShortCuircitOr"; }
+    
+    syn String LTExpr.getOperatorName(){ return "lt"; }
+    syn String GTExpr.getOperatorName(){ return "gt"; }
+    syn String LEExpr.getOperatorName(){ return "le"; }
+    syn String GEExpr.getOperatorName(){ return "ge"; }
+    syn String EQExpr.getOperatorName(){ return "eq"; }
+    syn String NEExpr.getOperatorName(){ return "ne"; }
+    
+    syn String UnaryExpr.getOperatorName(){ return ""; }
+    syn String UMinusExpr.getOperatorName(){ return "uminus"; }
+    syn String UPlusExpr.getOperatorName(){ return "uplus"; }
+    syn String NotExpr.getOperatorName(){ return "not"; }
+    syn String MTransposeExpr.getOperatorName(){ return "transpose"; }
+    syn String ArrayTransposeExpr.getOperatorName(){ return "ctranspose"; }
+}

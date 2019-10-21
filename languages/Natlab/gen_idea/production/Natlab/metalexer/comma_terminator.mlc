@@ -1,0 +1,19 @@
+%component comma_terminator
+
+%extern "Symbol symbol(short, Object, int, int, int, int)"
+
+%extern "int storedLine"
+%extern "int storedCol"
+
+%%
+%%inherit macros
+%%inherit comment_start
+
+{OtherWhiteSpace} {: /* ignore */ :}
+{LineTerminator} {: return symbol(COMMA_LINE_TERMINATOR, null, storedLine + 1, storedCol + 1, yyline + 1, yycolumn + yylength()); :} END_COMMA_TERMINATOR
+
+%:
+%:
+
+<<ANY>> {: yypushback(1); return symbol(COMMA, null, storedLine + 1, storedCol + 1, storedLine + 1, storedCol + 1); :} END_COMMA_TERMINATOR
+<<EOF>> {: return symbol(COMMA, null, storedLine + 1, storedCol + 1, storedLine + 1, storedCol + 1); :} END_COMMA_TERMINATOR

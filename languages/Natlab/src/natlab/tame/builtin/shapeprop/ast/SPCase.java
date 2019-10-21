@@ -28,15 +28,15 @@ public class SPCase<V extends Value<V>> extends SPNode<V> {
 		 * if there is no error when do shape matching.
 		 */
 		else {
+			isPatternSide = false;
 			if (patternMatch.getHowManyMatched()==argValues.size()) {
-				isPatternSide = false;
+				System.out.println(argValues+" ,"+Nargout);
 				if (Debug) System.out.println("matching part is done successfully!");
 				ShapePropMatch<V> outputMatch = outputlist.match(isPatternSide, patternMatch, argValues, Nargout);
 				// we may don't need argValues in output side.
 				return outputMatch;
 			}
 			else {
-				isPatternSide = false;
 				patternMatch.setIsError(true);
 				return patternMatch;
 			}			

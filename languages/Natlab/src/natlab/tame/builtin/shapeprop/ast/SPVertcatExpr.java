@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import natlab.tame.builtin.shapeprop.ShapePropMatch;
 import natlab.tame.valueanalysis.components.shape.DimValue;
+import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.components.shape.Shape;
 import natlab.tame.valueanalysis.components.shape.ShapeFactory;
 import natlab.tame.valueanalysis.value.Args;
@@ -35,13 +36,20 @@ public class SPVertcatExpr<V extends Value<V>> extends SPAbstractVectorExpr<V> {
 			/*
 			 * test whether it is an empty shape.
 			 */
+			//TODO (dherre3) Check this conditions better, it is still possible to have more than 1 match when is emtpy consider colon([],[],[])
 			if (!previousMatchResult.getIsInsideAssign() && vl==null) {
-				if (argValues.size()==0) {
+//				if (argValues.size() == 1) {
+					if(previousMatchResult.getHowManyMatched() >= argValues.size()
+					|| ((HasShape)argValues.get(previousMatchResult.getHowManyMatched()))
+							.getShape().getHowManyElements(0) != 0){
+					    previousMatchResult.setIsError(true);
+					}
+					previousMatchResult.comsumeArg();
 					// matching empty shape successfully.
 					return previousMatchResult;
-				}
-				previousMatchResult.setIsError(true);
-				return previousMatchResult;
+//				}
+//				previousMatchResult.setIsError(true);
+//				return previousMatchResult;
 			}
 			else if (previousMatchResult.getIsInsideAssign() && vl==null) {
 				// TODO this is used for generating an empty shape, and later to store shape info propagation result.

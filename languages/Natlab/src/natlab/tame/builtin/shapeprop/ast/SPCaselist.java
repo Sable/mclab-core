@@ -19,7 +19,7 @@ public class SPCaselist<V extends Value<V>> extends SPNode<V> {
 		ShapePropMatch<V> matchResult = first.match(isPatternSide, previousMatchResult, argValues, Nargout);
 		// the first case's shape matching is successful.
 		if (matchResult.getIsoutputDone()) {
-			if (Debug) System.out.println("matching and results emmitting successfully!");
+            if (Debug) System.out.println("matching and results emmitting successfully!");
 			return matchResult;
 		}
 		// the first case's shape matching doesn't succeed, go to next case if there is one.

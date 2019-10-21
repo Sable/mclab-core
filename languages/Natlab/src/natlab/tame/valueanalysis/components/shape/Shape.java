@@ -53,7 +53,10 @@ public class Shape implements Mergable<Shape> {
     public List<DimValue> getDimensions() {
     	return dimensions;
     }
-    
+
+    public int ndim(){
+		return dimensions.size();
+	}
     public void setDimensions(List<DimValue> newDimensions) {
     	dimensions = newDimensions;
     }
@@ -106,7 +109,8 @@ public class Shape implements Mergable<Shape> {
     }
     
     /**
-     * returns treu if this shape is row vector.
+	 *
+     * returns true if this shape is row vector.
      */
     public boolean isRowVector() {
     	if (dimensions.size() != 2) return false;
@@ -115,7 +119,22 @@ public class Shape implements Mergable<Shape> {
     	}
     	else return false;
     }
-    
+
+	/**
+	 * Modified by: (Dherre3)
+	 * @return Boolean representing whether the shape is a vector;
+	 */
+	public boolean isVector(){
+    	return isRowVector() || isColVector();
+	}
+	/**
+	 * Modified by: (Dherre3)
+	 * Shape method to determine whether the same is a matrix
+	 * @return Boolean representing whether the dimensions are two
+	 */
+	public boolean isMatrix() {
+    	return dimensions.size() == 2;
+	}
     /**
      * returns true if this shape is column vector.
      */
@@ -126,11 +145,50 @@ public class Shape implements Mergable<Shape> {
     	}
     	else return false;
     }
-    
+
+	/**
+	 * Compares two shapes and returns whether the two shapes are the same.
+	 * @param that
+	 * @return returns whether shapes are constant and equal
+	 */
+	public boolean isConstantAndEquals(Shape that) {
+		return this.isConstant() && that.isConstant() && this.equals(that);
+	}
+	/**
+	 * Compares the shapes and determines whether they are compatible
+	 * @param that Input Shape to compare against
+	 * @return An integer, -1 means they may be but we do not know,
+	 * if result is 0, they are not, if is 1 they are compatible
+	 */
+	public int isCompatible(Shape that){
+		List<DimValue> shapeThat = that.getDimensions();
+		List<DimValue> shapeThis = this.getDimensions();
+		if(shapeThis == null || shapeThat == null) return -1;
+		int len = (shapeThat.size()> shapeThis.size())?shapeThat.size():shapeThis.size();
+		for(int i = 0; i < len; i++){
+			if(i < shapeThat.size() && i < shapeThis.size()) {
+				if( shapeThat.get(i).hasIntValue() &&
+						shapeThis.get(i).hasIntValue() ){
+					// If one dimension is not a singleton for either one, or the two dimensions are not equal.
+					if ((shapeThat.get(i).getIntValue() >1 && shapeThis.get(i).getIntValue() == 1) ||
+							(shapeThis.get(i).getIntValue() >1 && shapeThat.get(i).getIntValue() == 1) ||
+							shapeThat.get(i).getIntValue().equals(shapeThis.get(i).getIntValue())) {
+						continue;
+					}
+					return 0;
+				}else{
+					// We do not know whether they are broadcastable
+					return -1;
+				}
+			}
+		}
+		return 1;
+	}
     /**
-     * returns true if this shape may be vector.
+	 *
+     * returns true if this shape may be vector or a scalar.
      */
-    public boolean maybeVector() {
+    public boolean maybeScalarOrVector() {
     	if (dimensions.size() != 2) return false;
     	else if (dimensions.get(0).equalsOne() && !dimensions.get(1).equalsOne()) {
     		return true;

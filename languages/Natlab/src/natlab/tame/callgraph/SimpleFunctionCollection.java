@@ -183,6 +183,11 @@ public class SimpleFunctionCollection extends
 					funcRef.getFile());
 			StaticFunction function = new StaticFunction(functionAst, ref,
 					context);
+
+			//function.applySimplification();
+//			function.getAst();
+//			function.as
+//			function.setAst
 			this.put(ref, function);
 
 			// recursively load referenced functions

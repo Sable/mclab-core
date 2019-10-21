@@ -1,0 +1,128 @@
+%package "natlab.tame.builtin.isComplexInfoProp";
+%import "natlab.tame.builtin.isComplexInfoProp.ast.*";
+%import "java.util.*";
+%class "isComplexInfoPropParser";
+
+
+%terminals NUMBER, ID ;
+%terminals OROR, ARROW, COMMA, QUESTION, COLON, MULT, PLUS, LOR, LAND, LCURLY, RCURLY, LT, GT, LTE, GTE, EQEQ, NEQ;
+%terminals ANY, COMPLEX, REAL;
+
+
+
+%left  PLUS, MULT, QUESTION;
+%left  LT, GT, LTE, GTE, EQEQ, NEQ;
+%left  LOR, LAND;
+%left  COMMA;
+%left  ARROW;
+%left  OROR;
+
+
+%typeof NUMBER = "Number";
+%typeof ID = "String";
+%typeof caselist = "ICCaselist";
+%typeof case = "ICCase";
+%typeof inputValueList = "ICinputValueList";
+%typeof inputValue = "ICAbstractValue";
+%typeof outputValue = "ICAbstractValue";
+%typeof isComplexValue, isComplexValueWithCondition = "ICAbstractValue";
+%typeof ConditionSet = "ICConditionSet";
+%typeof Condition = "ICCondition";
+%typeof outputValueList = "ICoutputValueList";
+%typeof ternaryOpExp = "ICternaryOpExp";
+
+%typeof QOp = "ICQOp";
+%typeof Logical = "ICLogical";
+
+%typeof RelOp = "ICRelop";
+%typeof Value = "ICValue";
+%typeof inputAttribute = "ICinputAtt";
+
+
+%goal caselist;
+
+caselist
+    = case.cs                                  					  {: return new ICCaselist(null, cs); :}
+    | caselist.csl OROR case.cs                  				  {: return new ICCaselist(csl, cs); :}
+    ;
+    
+case
+	= inputValueList.ivl ARROW outputValueList.ovl                    {: return new ICCase(ivl, ovl); :}
+	;   
+	    
+inputValueList
+	= inputValue.iv                                                  {: return new ICinputValueList(null, iv); :}     
+	| inputValueList.ivl COMMA inputValue.iv     	                 {: return new ICinputValueList (ivl, iv); :}
+	;
+inputValue
+	= isComplexValue.xv												  {: return new ICComplexValue (xv); :}		
+	| isComplexValue.xv QOp.qop                                       {: return new ICComplexValueQ (xv, qop); :}   
+	| isComplexValueWithCondition.xvc 								   {: return new ICComplexValueWC (xvc); :}
+	| isComplexValueWithCondition.xvc QOp.qop                          {: return new ICComplexValueWCQ (xvc, qop); :}
+	;
+isComplexValue
+	= ANY.a 															{: return new ICTypeA(); :}		
+	| COMPLEX.x														{: return new ICTypeX(); :}			
+	| REAL.r															{: return new ICTypeR(); :}	
+	;
+isComplexValueWithCondition
+	= isComplexValue.xv LCURLY ConditionSet.cos RCURLY				{: return new ICComplexValueWCExpanded(xv, cos); :}
+	;
+QOp
+	= PLUS.pl															{: return new ICQplus(); :}	
+	| MULT.mu															{: return new ICQmult(); :}		
+	| QUESTION.qu														{: return new ICQquestion(); :}		
+	;
+ConditionSet		
+	= Condition.co													 {: return new ICConditionSet(null, null, co); :}
+	| ConditionSet.cos Logical.lo Condition.co					     {: return new ICConditionSet(cos, lo, co); :}
+	;
+	
+Condition
+	= RelOp.ro Value.val											  {: return new ICCondition(ro, val); :}	
+	;
+
+Logical
+	= LAND.land															 {: return new ICLand(); :}		
+	| LOR.lor															 {: return new ICLor(); :}		
+	;
+
+	
+RelOp
+	= LT.lt															{: return new ICRlt(); :}	
+	| GT.gt															{: return new ICRgt(); :}	
+	| LTE.lte															{: return new ICRlte(); :}	
+	| GTE.gte															{: return new ICRgte(); :}	
+	| EQEQ.eqeq															{: return new ICReqeq(); :}	
+	| NEQ.neq															{: return new ICRneq(); :}	
+	;
+	
+Value
+	= NUMBER.n														{: return new ICNumber(n); :}
+	;
+	
+outputValueList
+	= outputValue.ov												{: return new ICoutputValueList(null, ov); :}
+	| outputValueList.ovl COMMA outputValue.ov						{: return new ICoutputValueList(ovl, ov); :}
+	;
+	
+outputValue
+	= ternaryOpExp.toe												{: return new ICtoe (toe); :}
+	| isComplexValue.xv												{: return new ICComplexValue (xv); :}						
+	| isComplexValue.xv QOp.qop										{: return new ICComplexValueQ (xv, qop); :}  
+	;
+	
+ternaryOpExp
+	= inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 QOp.qop1 COLON isComplexValue.xv2 QOp.qop2  {: return new ICtoeExp(ia, co, xv1, qop1, xv2, qop2); :}
+	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON isComplexValue.xv2					{: return new ICtoeExp(ia, co, xv1, null, xv2, null); :}
+	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON isComplexValue.xv2 QOp.qop2  {: return new ICtoeExp(ia, co, xv1, null, xv2, qop2); :}
+	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 QOp.qop1 COLON isComplexValue.xv2  {: return new ICtoeExp(ia, co, xv1, qop1, xv2, null); :}
+	| inputAttribute.ia Condition.co QUESTION isComplexValue.xv1 COLON								{: return new ICtoeExp(ia, co, xv1, null, null, null); :}
+	
+	;
+	
+inputAttribute
+	= ID.i                                                            {: return new ICid(i); :}
+	;
+	
+		 	

@@ -1,0 +1,413 @@
+/*
+
+Copyright 2011 Toheed Aslam, Jesse Doherty, Soroush Radpour and McGill University.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless rpublic voiduired by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+*/
+
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.google.common.collect.Iterables;
+
+import natlab.toolkits.analysis.varorfun.VFDatum;
+import natlab.toolkits.analysis.varorfun.VFFlowInsensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFFlowSensitiveAnalysis;
+import natlab.toolkits.analysis.varorfun.VFPreorderAnalysis;
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import natlab.utils.NodeFinder;
+
+aspect ASTtoXML {
+  protected static boolean ASTNode.include_kinds_in_xml = true;
+  protected static VFFlowInsensitiveAnalysis ASTNode.kind_analysis_insensitive = null;
+  protected static VFFlowSensitiveAnalysis ASTNode.kind_analysis_sensitive = null;
+  protected static VFPreorderAnalysis ASTNode.kind_analysis_preorder = null;
+
+	public long CompilationUnits.nodeCounter = 0;
+
+	public long ASTNode.nodeCounter() {
+    if (this instanceof CompilationUnits) return ((CompilationUnits) this).nodeCounter++;
+    CompilationUnits parent = NodeFinder.findParent(CompilationUnits.class, this);
+    return parent == null ? 0 : parent.nodeCounter++;
+  }
+
+  protected Element ASTNode.createXmlElement(Document doc, Element parent, Iterable<? extends ASTNode> children, String... attributes) {
+    Element e = doc.createElement(getClass().getSimpleName());
+    e.setAttribute("id", "" + nodeCounter());
+    e.setAttribute("line", "" + getStartLine());
+    e.setAttribute("col", "" + getStartColumn());
+    for (int i = 0; i < attributes.length; i += 2) {
+      e.setAttribute(attributes[i], attributes[i + 1]);
+    }
+    addChildrenXml(doc, e, children);
+    parent.appendChild(e);
+    return e;
+  }
+
+  protected Element ASTNode.createXmlElement(Document doc, Element parent, String... attributes) {
+    return createXmlElement(doc, parent, Collections.<ASTNode>emptyList(), attributes);
+  }
+
+  protected void ASTNode.addChildrenXml(Document doc, Element e, Iterable<? extends ASTNode> children) {
+    for (ASTNode child : children) {
+      child.getXML(doc, e);
+    }
+  }
+
+  protected void ASTNode.addChildrenXml(Document doc, Element e, String name, Iterable<? extends ASTNode> children) {
+    Element c = doc.createElement(name);
+    addChildrenXml(doc, c, children);
+    e.appendChild(c);
+  }
+
+  public Document CompilationUnits.ASTtoXML(boolean includeKinds) {
+    boolean oldIncludeKinds = include_kinds_in_xml;
+    include_kinds_in_xml = includeKinds;
+    Document result = ASTtoXML();
+    include_kinds_in_xml = oldIncludeKinds;
+    return result;
+  }
+
+  public Document CompilationUnits.ASTtoXML() {
+    try {
+      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      Element e = doc.createElement("CompilationUnits");
+      e.setAttribute("id", "" + nodeCounter());
+      addChildrenXml(doc, e, getPrograms());
+      doc.appendChild(e);
+      return doc;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public String CompilationUnits.XMLtoString(Document doc) {
+    try {
+      TransformerFactory factory = TransformerFactory.newInstance();
+      factory.setAttribute("indent-number", 4);
+      Transformer transformer = factory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+      StringWriter sw = new StringWriter();
+      transformer.transform(new DOMSource(doc), new StreamResult(sw));
+      return sw.toString();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void ASTNode.getXML(Document doc, Element parent) {
+    throw new UnsupportedOperationException(getClass().getName() + ".getXML()");
+  }
+
+  protected void Program.doKindAnalysis() {
+      kind_analysis_sensitive = new VFFlowSensitiveAnalysis(this, this.getFunctionOrScriptQuery());
+      kind_analysis_sensitive.analyze();
+      kind_analysis_insensitive = new VFFlowInsensitiveAnalysis(this, this.getFunctionOrScriptQuery());
+      kind_analysis_insensitive.analyze();
+      kind_analysis_preorder = new VFPreorderAnalysis(this);
+      kind_analysis_preorder.analyze();
+  }
+
+  public void Script.getXML(Document doc, Element parent) {
+    if (include_kinds_in_xml) {
+        doKindAnalysis();
+    }
+    Element e = createXmlElement(doc, parent, getHelpComments(),
+        "fullpath", getFile().getPath(), "name", getFile().getNameWithoutExtension());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void FunctionList.getXML(Document doc, Element parent) {
+    if (include_kinds_in_xml) {
+        doKindAnalysis();
+    }
+    createXmlElement(doc, parent, getFunctions(), "fullpath", getFile().getPath());
+  }
+
+  public void Function.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+    addChildrenXml(doc, e, getHelpComments());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+    addChildrenXml(doc, e, getNestedFunctions());
+  }
+
+  public void ClassDef.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getAttributes(), getSuperClasss(), getHelpComments(),
+        getPropertys(), getMethods(), getClassEvents()),
+        "name", getName());
+  }
+
+  public void Properties.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(getAttributes(), getPropertys()));
+  }
+
+  public void Methods.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getAttributes(), getSignatures(), getPropAccs(), getFunctions()));
+  }
+
+  public void Signature.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, "name", getName());
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+  }
+
+  public void PropertyAccess.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, "name", getName(), "access", getAccess());
+    addChildrenXml(doc, e, "InputParamList", getInputParams());
+    addChildrenXml(doc, e, "OutputParamList", getOutputParams());
+    addChildrenXml(doc, e, getHelpComments());
+    addChildrenXml(doc, e, "StmtList", getStmts());
+    addChildrenXml(doc, e, getNestedFunctions());
+  }
+
+  public void ClassEvents.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(getAttributes(), getEvents()));
+  }
+
+  public void Attribute.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()), "name", getKey());
+  }
+
+  public void SuperClass.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "name", getName());
+  }
+
+  public void Property.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()), "name", getName());
+  }
+
+  public void Event.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "name", getName());
+  }
+
+  public void SuperClassMethodExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getFuncName(), getClassName()));
+  }
+
+  public void HelpComment.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "text", getText());
+  }
+
+  public void EmptyStmt.getXML(Document doc, Element parent) {}
+
+  public void ExprStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getExpr()),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void AssignStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getLHS(), getRHS()),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void GlobalStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getNames(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void PersistentStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getNames(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ShellCommandStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "command", getCommand(),
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void BreakStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ContinueStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ReturnStmt.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent,
+        "outputSuppressed", String.valueOf(isOutputSuppressed()));
+  }
+
+  public void ForStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getAssignStmt()),
+        "is_parfor", String.valueOf(isParfor()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void WhileStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getExpr()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void IfStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, getIfBlocks());
+    if (hasElseBlock()) {
+      getElseBlock().getXML(doc, e);
+    }
+  }
+
+  public void IfBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getCondition()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void ElseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void SwitchStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getExpr()), getSwitchCaseBlocks()));
+    if (hasDefaultCaseBlock()) {
+      getDefaultCaseBlock().getXML(doc, e);
+    }
+  }
+
+  public void SwitchCaseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getExpr()));
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void DefaultCaseBlock.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getStmts());
+  }
+
+  public void TryStmt.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent);
+    addChildrenXml(doc, e, "StmtList", getTryStmts());
+    if (getCatchStmts().getNumChild() > 0) {
+      addChildrenXml(doc, e, "StmtList", getCatchStmts());
+    }
+  }
+
+  public void RangeExpr.getXML(Document doc, Element parent) {
+    if (hasIncr()) {
+      createXmlElement(doc, parent, Arrays.asList(getLower(), getIncr(), getUpper()));
+    } else {
+      createXmlElement(doc, parent, Arrays.asList(getLower(), getUpper()));
+    }
+  }
+
+  public void ColonExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent);
+  }
+
+  public void EndExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent);
+  }
+
+  public void Name.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "nameId", getID());
+  }
+
+  public void NameExpr.annotateXMLWithKind(Element e, String name, Map<String, VFDatum> f, String n){
+    VFDatum d = null;
+    if (f != null) {
+      d = f.get(n);
+    }
+    String kind="null";
+    if (d != null) {
+      kind = d.toString();
+    }
+    e.setAttribute(name, kind);
+  }
+
+  public void NameExpr.getXML(Document doc, Element parent) {
+    Element e = createXmlElement(doc, parent, Arrays.asList(getName()));
+    if (include_kinds_in_xml) {
+      Map<String, VFDatum> out_sensitive = kind_analysis_sensitive.getOutFlowSets()
+          .get(getName());
+      Map<String, VFDatum> out_insensitive = kind_analysis_insensitive.getFlowSets()
+          .get(getName());
+      Map<String, VFDatum> out_preorder = kind_analysis_preorder.getFlowSets().get(getName());
+      annotateXMLWithKind(e, "kind", out_preorder, getName().getID());
+      annotateXMLWithKind(e, "kind_insensitive", out_insensitive, getName().getID());
+      annotateXMLWithKind(e, "kind_sensitive", out_sensitive, getName().getID());
+    }
+  }
+
+  public void DotExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getTarget(), getField()));
+  }
+
+  public void ParameterizedExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getTarget()), getArgs()));
+  }
+
+  public void CellIndexExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        Arrays.asList(getTarget()), getArgs()));
+  }
+
+  public void MatrixExpr.getXML(Document doc, Element parent) {
+     createXmlElement(doc, parent, getRows());
+  }
+
+  public void CellArrayExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getRows());
+  }
+
+  public void Row.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, getElements());
+  }
+
+  public void FunctionHandleExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getName()));
+  }
+
+  public void LambdaExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Iterables.concat(
+        getInputParams(), Arrays.asList(getBody())));
+  }
+
+  public void IntLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue().getText());
+  }
+
+  public void FPLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue().getText());
+  }
+
+  public void StringLiteralExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, "value", getValue());
+  }
+
+  public void UnaryExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getOperand()));
+  }
+
+  public void BinaryExpr.getXML(Document doc, Element parent) {
+    createXmlElement(doc, parent, Arrays.asList(getLHS(), getRHS()));
+  }
+}

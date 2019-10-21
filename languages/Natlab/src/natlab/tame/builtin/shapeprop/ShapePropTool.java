@@ -79,61 +79,62 @@ public class ShapePropTool<V extends Value<V>> {
      * @throws Parser.Exception
      */
 	public static void main(String[] args) throws IOException, Parser.Exception {
-				
-		System.out.println("print:   "+parse("$,'a2'->M||#->[]"));
-		String s0 = parse("$,'a2'->M||#->[]").toString();
-		System.out.println("reparsed "+parse(s0));
-		
-		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
-		String s1 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
-		System.out.println("reparsed "+parse(s1));
-		
-		System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M"));
-		String s2 = parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M").toString();
-		System.out.println("reparsed "+parse(s2));
-		
-		System.out.println("print:   "+parse("($|M)*->M"));
-		String s3 = parse("($|M)*->M").toString();
-		System.out.println("reparsed "+parse(s3));
-		
-		System.out.println("print:   "+parse("M->M"));
-		String s4 = parse("M->M").toString();
-		System.out.println("reparsed "+parse(s4));
-		
-		System.out.println("print:   "+parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$"));
-		String s5 = parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$").toString();
-		System.out.println("reparsed "+parse(s5));
-		
-		System.out.println("print:   "+parse("$,$|[m,n]->[m,n]||$|[m,n],$->[m,n]||[m,k]|[k,n]->[m,n]"));
-		String s6 = parse("$,$|[m,n]->[m,n]||$|[m,n],$->[m,n]||[m,k]|[k,n]->[m,n]").toString();
-		System.out.println("reparsed "+parse(s6));
-		
-		System.out.println("print:   "+parse("[m,m]->[m,m],$,$"));
-		String s7 = parse("[m,m]->[m,m],$,$").toString();
-		System.out.println("reparsed "+parse(s7));
-		
-		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M"));
-		String s8 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M").toString();
-		System.out.println("reparsed "+parse(s8));
-		
-		System.out.println("print:   "+parse(
-				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
-				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K"));
-		String s9 = parse("" +
-				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
-				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K").toString();
-		System.out.println("reparsed "+parse(s9));
-		
-		System.out.println("print:   "+parse(
-				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
-				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K"));
-		String s10 = parse(
-				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
-				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K").toString();
-		System.out.println("reparsed "+parse(s10));
-		
-		System.out.println("print:   "+parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M"));
-		String s11 = parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M").toString();
-		System.out.println("reparsed "+parse(s11));
+		System.out.println("print: "+parse("_->_"));
+
+//		System.out.println("print:   "+parse("$,'a2'->M||#->[]"));
+//		String s0 = parse("$,'a2'->M||#->[]").toString();
+//		System.out.println("reparsed "+parse(s0));
+//		
+//		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M"));
+//		String s1 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(n),M=[M,m])+->M||[1,n],M=prevector(n)->M").toString();
+//		System.out.println("reparsed "+parse(s1));
+//		
+//		System.out.println("print:   "+parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M"));
+//		String s2 = parse("[1,n]|[n,1]->$||[m,n]->[1,n]||M,M(1)=1->M,M||$|M,$|M->M||M,[],$,d=previousScalar(),M(d)=1->M,M").toString();
+//		System.out.println("reparsed "+parse(s2));
+//		
+//		System.out.println("print:   "+parse("($|M)*->M"));
+//		String s3 = parse("($|M)*->M").toString();
+//		System.out.println("reparsed "+parse(s3));
+//		
+//		System.out.println("print:   "+parse("M->M"));
+//		String s4 = parse("M->M").toString();
+//		System.out.println("reparsed "+parse(s4));
+//		
+//		System.out.println("print:   "+parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$"));
+//		String s5 = parse("numOutput(1),$|M,k=previousShapeDim()->[1,k]||numOutput(2),[m,n]->$,$").toString();
+//		System.out.println("reparsed "+parse(s5));
+//		
+//		System.out.println("print:   "+parse("$,$|[m,n]->[m,n]||$|[m,n],$->[m,n]||[m,k]|[k,n]->[m,n]"));
+//		String s6 = parse("$,$|[m,n]->[m,n]||$|[m,n],$->[m,n]||[m,k]|[k,n]->[m,n]").toString();
+//		System.out.println("reparsed "+parse(s6));
+//		
+//		System.out.println("print:   "+parse("[m,m]->[m,m],$,$"));
+//		String s7 = parse("[m,m]->[m,m],$,$").toString();
+//		System.out.println("reparsed "+parse(s7));
+//		
+//		System.out.println("print:   "+parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M"));
+//		String s8 = parse("$,m=previousScalar()->[m,m]||M=[],($,m=previousScalar(),M=[M,m])+->M||[1,n],M=prevector()->M").toString();
+//		System.out.println("reparsed "+parse(s8));
+//		
+//		System.out.println("print:   "+parse(
+//				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
+//				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K"));
+//		String s9 = parse("" +
+//				"M,n=previousShapeDim(1),K=copy(M),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K" +
+//				"||$,n=previousShapeDim(1),K=copy($),K(1)=0,(#,k=previousShapeDim(1),N=copy(#),N(1)=0,isequal(K,N),n=increment(k))*,K(1)=n->K").toString();
+//		System.out.println("reparsed "+parse(s9));
+//		
+//		System.out.println("print:   "+parse(
+//				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
+//				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K"));
+//		String s10 = parse(
+//				"M,n=previousShapeDim(2),K=copy(M),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K" +
+//				"||$,n=previousShapeDim(2),K=copy($),K(2)=0,(#,k=previousShapeDim(2),N=copy(#),N(2)=0,isequal(K,N),n=increment(k))*,K(2)=n->K").toString();
+//		System.out.println("reparsed "+parse(s10));
+//		
+//		System.out.println("print:   "+parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M"));
+//		String s11 = parse("$|M->M||$,$,n=previousScalar()->[1,n]||M,$,n=previousScalar(),M(1)=n->M||M,[],$->M").toString();
+//		System.out.println("reparsed "+parse(s11));
 	}
 }

@@ -1,0 +1,19 @@
+%component bracket_comment
+
+%extern "Symbol symbol(short, Object, int, int, int, int)"
+%extern "void error(String) throws Scanner.Exception"
+%extern "CommentBuffer commentBuffer"
+
+%appendWithStartDelim{ /*(int startLine, int startCol, int endLine, int endCol, String text)*/
+    commentBuffer.pushComment(symbol(BRACKET_COMMENT, text, startLine + 1, startCol + 1, endLine + 1, endCol + 1));
+%appendWithStartDelim}
+
+%%
+%%inherit macros
+
+{OpenBracketComment} {: appendToStartDelim(yytext()); :} START_BRACKET_COMMENT
+{CloseBracketComment} {: append(yytext()); :} END_BRACKET_COMMENT
+%:
+%:
+<<ANY>> {: append(yytext()); :}
+<<EOF>> {: error("Unterminated bracket comment"); :} EOF_ERROR

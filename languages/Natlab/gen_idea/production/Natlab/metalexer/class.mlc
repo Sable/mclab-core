@@ -1,0 +1,22 @@
+%component class
+
+%extern "Symbol symbol(short)"
+%extern "Symbol symbol(short, Object)"
+
+%extern "void error(String) throws Scanner.Exception"
+
+%%
+%%inherit shared_symbols
+
+classdef {: return symbol(CLASSDEF); :} OPEN_END
+end {: return symbol(END); :} END
+
+properties {: return symbol(PROPERTIES); :} OPEN_END
+methods {: return symbol(METHODS); :} OPEN_END
+events {: return symbol(EVENTS); :} OPEN_END
+
+%%inherit shared_keywords
+%:
+%:
+<<ANY>> {: error("Illegal character in classdef '" + yytext() + "'"); :}
+<<EOF>> {: error("Unterminated classdef"); :} EOF_ERROR

@@ -26,7 +26,7 @@ import ast.Name;
 import ast.NameExpr;
 import ast.Opt;
 import ast.RangeExpr;
-
+import natlab.toolkits.analysis.core.Def;
 /**
  * IR For statement is of the form
  * 
@@ -39,7 +39,7 @@ import ast.RangeExpr;
  *
  * @author ant6n
  */
-public class TIRForStmt extends ForStmt implements TIRStmt {
+public class TIRForStmt extends ForStmt implements TIRStmt, Def {
     private static final long serialVersionUID = 1L;
 
     public TIRForStmt(Name var,Name lower,Name inc,Name upper,TIRStatementList stmts){

@@ -1,0 +1,69 @@
+/*
+Copyright 2011 of Jesse Doherty, Soroush Radpour and McGill University.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+*/
+import natlab.LocalFunctionLookupInterface;
+import natlab.LookupFile;
+import natlab.toolkits.filehandling.FunctionOrScriptQuery;
+import natlab.toolkits.filehandling.GenericFile;
+import natlab.utils.NodeFinder;
+
+aspect NameResolutionAdditions
+{
+    FunctionList implements LocalFunctionLookupInterface;
+    Function implements LocalFunctionLookupInterface;
+
+    public FunctionOrScriptQuery CompilationUnits.getFunctionOrScriptQuery() {
+      if (getRootFolder() == null) {
+        return LookupFile.getFunctionOrScriptQueryObject();
+      }
+      return getRootFolder().getAnyMatlabFile().getFunctionOrScriptQuery();
+    }
+
+    public FunctionOrScriptQuery Program.getFunctionOrScriptQuery() {
+      if (getFile() == null) {
+        return LookupFile.getFunctionOrScriptQueryObject();
+      }
+      return getFile().getFunctionOrScriptQuery();
+    }
+
+    public FunctionOrScriptQuery ASTNode.getFunctionOrScriptQuery() {
+      return NodeFinder.findParent(Program.class, this).getFunctionOrScriptQuery();
+    }
+
+    protected GenericFile CompilationUnits.rootFolder = null;
+
+    public GenericFile CompilationUnits.getRootFolder() {
+      return rootFolder;
+    }
+
+    public void CompilationUnits.setRootFolder(GenericFile root) {
+      this.rootFolder = root;
+    }
+
+    protected GenericFile Program.file = null;
+
+    public void Program.setFile(GenericFile f) {
+      this.file = f;
+    }
+
+    public GenericFile Program.getFile(){
+        return file;
+    }
+
+    public String Script.getName() {
+      return getFile().getNameWithoutExtension();
+    }
+}

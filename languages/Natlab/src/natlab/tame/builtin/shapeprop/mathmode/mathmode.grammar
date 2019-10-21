@@ -1,0 +1,63 @@
+%package "natlab.tame.builtin.shapeprop.mathmode";
+%import "natlab.tame.builtin.shapeprop.mathmode.ast.*";
+%import "java.util.*";
+%class "ShapePropMathModeParser";
+
+
+%terminals NUMBER, ID, LOWERCASE;
+%terminals COMMA, RPARENT, LPARENT, RBRACKET,LBRACKET,POWER,TIMES,DIV,PLUS,MINUS,LT,GT,LE,GE,EQ,NE, AND;
+
+%left RPARENT;
+%nonassoc COMMA;
+%left TIMES, DIV,PLUS,MINUS;
+%right POWER;
+%left AND;
+%left LT,GT,LE,GE,EQ,NE;
+
+
+%typeof NUMBER = "Number";
+%typeof ID, LOWERCASE = "String";
+%typeof mathexpr="SPMathModeAbstractExpr";
+%typeof expr="SPMathModeAbstractExpr";
+%typeof F = "SPMathModeAbstractExpr";
+%typeof P = "SPMathModeAbstractExpr";
+%typeof T = "SPMathModeAbstractExpr";
+%typeof arglist="SPMathModeArglist";
+
+%goal mathexpr;
+
+mathexpr
+    = LBRACKET expr.e RBRACKET  {:return e; :}
+    ;
+expr
+    = expr.e PLUS T.f           {:return new SPMathModeBinOpExpr(BinOp.PLUS, e,f); :}
+    | expr.e MINUS T.f           {:return new SPMathModeBinOpExpr(BinOp.MINUS, e,f); :}
+    | expr.e  GT T.f          {:return new SPMathModeBinOpExpr(BinOp.GT,  e,f); :}
+    | expr.e LT   T.f            {:return new SPMathModeBinOpExpr(BinOp.LT,  e,f); :}
+    | expr.e GE T.f            {:return new SPMathModeBinOpExpr(BinOp.GE, e,f); :}
+    | expr.e  LE  T.f          {:return new SPMathModeBinOpExpr(BinOp.LE, e,f); :}
+    | expr.e EQ T.f             {:return new SPMathModeBinOpExpr(BinOp.EQ, e,f); :}
+    | expr.e NE T.f             {:return new SPMathModeBinOpExpr(BinOp.NE,  e,f); :}
+    | expr.e AND T.f             {:return new SPMathModeBinOpExpr(BinOp.AND,  e,f); :}
+    | T.e                       {:return e; :}
+    ;
+T =
+  |  P.f  TIMES T.e         {:return new SPMathModeBinOpExpr(BinOp.TIMES,  f,e); :}
+  | P.f  DIV  T.e         {:return new SPMathModeBinOpExpr(BinOp.DIV,  f,e); :}
+  | P.p                     {:return p;:}
+  ;
+
+P =  F.f POWER P.e         {:return new SPMathModeBinOpExpr(BinOp.POW,  f,e); :}
+    |F.f                    {:return f;:}
+;
+F
+    = LPARENT expr.e RPARENT            {:return e; :}
+    | ID.i LPARENT arglist.l RPARENT    {:return new SPMathModeFuncCallExpr(i, l); :}
+    | LOWERCASE.l           {:return new SPMathModeLowercaseExpr(l); :}
+    | MINUS F.l           {:return new SPMathModeUnOpExpr(l); :}
+    | NUMBER.n              {:return new SPMathModeNumberExpr(n); :}
+    ;
+arglist
+    = expr.e             {:return new SPMathModeArglist(e,null); :}
+    | expr.e COMMA arglist.l   {:return new SPMathModeArglist(e,l); :}
+    ;

@@ -1,0 +1,397 @@
+// =========================================================================== //
+//                                                                             //
+// Copyright 2008-2011 Andrew Casey, Jun Li, Jesse Doherty,                    //
+//   Maxime Chevalier-Boisvert, Toheed Aslam, Anton Dubrau, Nurudeen Lameed,   //
+//   Amina Aslam, Rahul Garg, Soroush Radpour, Olivier Savary Belanger,        //
+//   Laurie Hendren, Clark Verbrugge and McGill University.                    //
+//                                                                             //
+//   Licensed under the Apache License, Version 2.0 (the "License");           //
+//   you may not use this file except in compliance with the License.          //
+//   You may obtain a copy of the License at                                   //
+//                                                                             //
+//       http://www.apache.org/licenses/LICENSE-2.0                            //
+//                                                                             //
+//   Unless required by applicable law or agreed to in writing, software       //
+//   distributed under the License is distributed on an "AS IS" BASIS,         //
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  //
+//   See the License for the specific language governing permissions and       //
+//   limitations under the License.                                            //
+//                                                                             //
+// =========================================================================== //
+
+
+aspect ASTAnalyze
+{
+    public void ASTNode.analyze(nodecases.NodeCaseHandler visitor){
+        visitor.caseASTNode(this);
+    }
+    public void List.analyze(nodecases.NodeCaseHandler visitor){
+        visitor.caseList(this);
+    }
+    public void Program.analyze(nodecases.NodeCaseHandler visitor){
+        visitor.caseProgram(this);
+    }
+    
+    public void Stmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseStmt(this);
+    }
+    public void EmptyStmt.analyze(nodecases.NodeCaseHandler visitor){
+        visitor.caseEmptyStmt(this);
+    }
+    
+    public void BreakStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseBreakStmt(this);
+    }
+    public void ContinueStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseContinueStmt(this);
+    }
+    public void ReturnStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseReturnStmt(this);
+    }
+    public void ForStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseForStmt(this);
+    }
+    public void WhileStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseWhileStmt(this);
+    }
+    public void TryStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseTryStmt(this);
+    }
+    public void SwitchStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseSwitchStmt(this);
+    }
+    public void IfStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseIfStmt(this);
+    }
+
+    public void Script.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseScript(this);
+    }
+    public void FunctionList.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseFunctionList(this);
+    }
+    public void ExprStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseExprStmt(this);
+    }
+    public void AssignStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseAssignStmt(this);
+    }
+    public void GlobalStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseGlobalStmt(this);
+    }
+    public void PersistentStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.casePersistentStmt(this);
+    }
+    public void ShellCommandStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseShellCommandStmt(this);
+    }
+    public void RangeExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseRangeExpr(this);
+    }
+    public void ColonExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseColonExpr(this);
+    }
+    public void EndExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEndExpr(this);
+    }
+    public void NameExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseNameExpr(this);
+    }
+    public void Name.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseName(this);
+    }
+    public void ParameterizedExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseParameterizedExpr(this);
+    }
+    public void CellIndexExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseCellIndexExpr(this);
+    }
+    public void DotExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseDotExpr(this);
+    }
+    public void MatrixExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMatrixExpr(this);
+    }
+    public void CellArrayExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseCellArrayExpr(this);
+    }
+    public void SuperClassMethodExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseSuperClassMethodExpr(this);
+    }
+    public void IntLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseIntLiteralExpr(this);
+    }
+    public void FPLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseFPLiteralExpr(this);
+    }
+    public void StringLiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseStringLiteralExpr(this);
+    }
+    public void UMinusExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseUMinusExpr(this);
+    }
+    public void UPlusExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseUPlusExpr(this);
+    }
+    public void NotExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseNotExpr(this);
+    }
+    public void MTransposeExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMTransposeExpr(this);
+    }
+    public void ArrayTransposeExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseArrayTransposeExpr(this);
+    }
+    public void PlusExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.casePlusExpr(this);
+    }
+    public void MinusExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMinusExpr(this);
+    }
+    public void MTimesExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMTimesExpr(this);
+    }
+    public void MDivExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMDivExpr(this);
+    }
+    public void MLDivExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMLDivExpr(this);
+    }
+    public void MPowExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMPowExpr(this);
+    }
+    public void ETimesExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseETimesExpr(this);
+    }
+    public void EDivExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEDivExpr(this);
+    }
+    public void ELDivExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseELDivExpr(this);
+    }
+    public void EPowExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEPowExpr(this);
+    }
+    public void AndExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseAndExpr(this);
+    }
+    public void OrExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseOrExpr(this);
+    }
+    public void ShortCircuitAndExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseShortCircuitAndExpr(this);
+    }
+    public void ShortCircuitOrExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseShortCircuitOrExpr(this);
+    }
+    public void LTExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseLTExpr(this);
+    }
+    public void GTExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseGTExpr(this);
+    }
+    public void LEExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseLEExpr(this);
+    }
+    public void GEExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseGEExpr(this);
+    }
+    public void EQExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEQExpr(this);
+    }
+    public void NEExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseNEExpr(this);
+    }
+    public void FunctionHandleExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseFunctionHandleExpr(this);
+    }
+    public void LambdaExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseLambdaExpr(this);
+    }
+
+    public void Function.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseFunction(this);
+    }
+    public void Row.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseRow(this);
+    }
+
+    //Begin IR nodes
+
+    public void CSLExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseCSLExpr(this);
+    }
+    public void EndCallExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEndCallExpr(this);
+    }
+    public void CheckScalarStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseCheckScalarStmt(this);
+    }
+
+    public void CompilationUnits.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseCompilationUnits(this);
+    }
+    public void Body.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseBody(this);
+    }
+    public void ClassBody.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseClassBody(this);
+    }
+    public void FunctionOrSignatureOrPropertyAccessOrStmt.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseFunctionOrSignatureOrPropertyAccessOrStmt(this);
+    }
+    public void ClassDef.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseClassDef(this);
+    }
+    public void Properties.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseProperties(this);
+    }
+    public void Property.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseProperty(this);
+    }
+    public void Methods.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMethods(this);
+    }
+    public void Signature.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseSignature(this);
+    }
+    public void PropertyAccess.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.casePropertyAccess(this);
+    }
+    public void ClassEvents.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseClassEvents(this);
+    }
+    public void Event.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseEvent(this);
+    }
+    public void HelpComment.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseHelpComment(this);
+    }
+    public void OneLineHelpComment.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseOneLineHelpComment(this);
+    }
+    public void MultiLineHelpComment.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseMultiLineHelpComment(this);
+    }
+    public void SwitchCaseBlock.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseSwitchCaseBlock(this);
+    }
+    public void DefaultCaseBlock.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseDefaultCaseBlock(this);
+    }
+    public void IfBlock.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseIfBlock(this);
+    }
+    public void ElseBlock.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseElseBlock(this);
+    }
+    public void LValueExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseLValueExpr(this);
+    }
+    public void LiteralExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseLiteralExpr(this);
+    }
+    public void UnaryExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseUnaryExpr(this);
+    }
+    public void BinaryExpr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseBinaryExpr(this);
+    }
+    public void Expr.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseExpr(this);
+    }
+    public void Attribute.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseAttribute(this);
+    }
+    public void SuperClass.analyze(nodecases.NodeCaseHandler visitor)
+    {
+        visitor.caseSuperClass(this);
+    }
+}

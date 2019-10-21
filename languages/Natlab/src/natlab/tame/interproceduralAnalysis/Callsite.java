@@ -32,6 +32,7 @@ import ast.ASTNode;
  * @author adubra
  */
 public class Callsite<F extends FunctionAnalysis<A,R>, A, R> {
+
 	private InterproceduralAnalysisNode<F, A, R> interProceduralAnalysisNode;
 	private ASTNode<?> astNode;
 	private HashMap<Call<A>,InterproceduralAnalysisNode<F,A,R>> calls

@@ -1,0 +1,109 @@
+Getting Started With the Refactoring Code
+=========================================
+
+The code lives in /projects/languages/Natlab/src/natlab/refactoring.
+Each Refactoring is implemented as a separate class. 
+
+Using the Refactoring Code
+==========================
+In order to use the refactorings first you need to create a parsed tree of the
+matlab project:
+* You need to parse the matlab codes and add the Program objects to a
+  CompilationUnit. 
+* Since Matlab name resolution is dependant on file names, you will also need
+  to set the filenames for each Program using Program.setFile(). 
+* Current working directory (PWD) is set using 
+  CompilationUnit.setRootDirectory(). 
+
+Once you have the AST set up, you can apply your refactoring. Each refactoring
+has its own interface. First you need to create an instance of the refactoring
+and pass the AST stored in the CompilationUnit to it. Here is a list of
+refactorings with their interfaces.
+
+MScriptInliner
+--------------
+List<Exception> MScriptInliner.inlineStmt(Stmt)
+Inlines an Statement of form 's()' where 's' is a script in the CompilationUnit
+accessible from current PWD.
+It returns a list of Exceptions and Warnings if there are any.
+
+FunctionInliner
+---------------
+List<Exception> FunctionInliner.inline(Stmt)
+Inlines an Statement of form 'out = f(inp)' where 'f' is a function in the
+CompilationUnit accessible from current context.
+It returns a list of Exceptions and Warnings if there are any.
+
+ExtractFunction
+---------------
+List<Exception> ExtractFunction.extract(StmtList, int start, int end, Function f)
+Extract a function from statements between StmtList[start] and StmtList[end]. 
+It can be the outer-most StmtList in a function or an StmtList with conditional/loop a block.
+User provide an empty function f that is filled during the refactoring.
+It returns a list of Exceptions and Warnings if there are any.
+
+ScriptToFunction
+---------------
+List<Exception> ScriptToFunction.replace(Script s, Function f)
+User provides a Script that is then converted to a function. Function f is used
+to return the computed result.
+
+FevalToCall
+---------------
+List<Exception> FevalToCall.replaceAll()
+Converts all calls to feval with a StringLiteral target to normal calls.
+List<Exception> FevalToCall.replace(ParameterizedExpr, KindAnalysis)
+Converts *one* call to feval with a StringLiteral target to a normal call.
+
+
+For examples on how to use these refactorings see the test cases in /projects/languages/Natlab/test/natlab/refactoring.
+
+
+Developing new Refactorings
+===========================
+Most of the tools necessary to create new refactorings are generic McLab tools.
+Almost any none-trivial refactoring needs an understanding of Matlab Kind semantics[1] and Name resolution semantics[2].
+ReachingDefinition and LivenessAnalysis are also critical in most of these refactoring. To learn about the implementation details please refer to the thesis[2]. McSaf thesis[3] is also very useful in order to familiarize with the static analysis framework.
+
+A number of utility classes were also developed that was very useful for refactorings: 
+NodeFinder
+----------
+* NodeFinder.find(ASTNode node, Class c)
+    Finds all descendants of node that are instances of class c.
+    Example: 
+    NodeFinder.find(cu, Function.class) finds all functions within the
+    compilation unit.
+
+* NodeFinder.findParent(ASTNode node, Class c)
+    Finds the closest ancestor of node that is an instance of class c.
+    Example: 
+    NodeFinder.findParent(stmt, Program.cu) 
+    finds the program that contains the statement.
+
+* NodeFinder.apply(ASTNode node, Class c, AbstractNodeFunction<T> F)
+    Applies function f to all instances of class c. Special cases can be
+    provided for each type of node. 
+    NodeFinder.apply(cu, Stmt.class, new AbstractNodeFunction<ExprStmt>(){
+      public void apply(ExprStmt node) {
+         // executed on every ExprStmt within cu
+      }});
+
+Context
+-------
+When combined with the kind analysis can provide proper Matlab semantics for name resolution. By itself it only holds information about current function/script, current path, and whether the context is a nested function, normal function, or a script.
+Context.resolve(String name, String dom): Resolves a name knowing that the dominant type is dom. Since it's not known most of the times you pass null for a generic lookup.
+
+ParsedCompilationUnitsContextStack
+----------------------------------
+Provides an stack of context for compilation units that are completely parsed in
+advance. It's specially useful for tracking context in nested functions since
+you only need to push when entering a function and pop once exiting the function.
+
+to push 
+
+
+
+
+[1] J. Doherty, L. Hendren, and S. Radpour. Kind analysis for MATLAB. In In Proceedings of OOPSLA 2011, pages 99–118, 2011.
+[2] S. Radpour. Understanding and Refactoring the MATLAB Language. Master’s thesis, McGill University, January 2012.
+[3] J. Doherty. McSAF: An Extensible Static Analysis Framework for the MATLAB Language. Master’s thesis, McGill University, December 2011.

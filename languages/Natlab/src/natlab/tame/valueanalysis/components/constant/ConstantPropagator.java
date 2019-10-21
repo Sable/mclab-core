@@ -25,7 +25,8 @@ import natlab.tame.valueanalysis.components.shape.DimValue;
 import natlab.tame.valueanalysis.components.shape.HasShape;
 import natlab.tame.valueanalysis.value.Args;
 import natlab.tame.valueanalysis.value.Value;
-
+import natlab.tame.valueanalysis.basicmatrix.BasicMatrixValue;
+import natlab.tame.valueanalysis.components.shape.Shape;
 import java.util.List;
 
 /**
@@ -74,6 +75,56 @@ public class ConstantPropagator<V extends Value<V>> extends BuiltinVisitor<Args<
     	if (arg.size() > 0) return null;
         return Constant.get(true);
     }
+
+	/**
+	 * Six built-ins to propagate here, Eye, Inf, Eye, Ones, Zeros, Magic (Incorrectly placed here)
+	 * @param builtin
+	 * @param arg
+	 * @return
+	 */
+    @Override
+    public Constant caseAbstractNumericalByShapeAndTypeMatrixCreation(Builtin builtin, Args<V> arg){
+
+
+
+    	return null;
+	}
+	@Override
+	public Constant caseMagic(Builtin builtin, Args<V> args){
+    	return null;
+	}
+    @Override
+	public Constant caseEnd(Builtin builtin, Args<V> arg){
+		if(arg.size() == 3 && arg.get(0) instanceof BasicMatrixValue && arg.get(1) instanceof BasicMatrixValue && arg.get(2) instanceof BasicMatrixValue){
+            BasicMatrixValue matrix = (BasicMatrixValue)arg.get(0);
+			BasicMatrixValue indices_num_matval = (BasicMatrixValue)arg.get(1);
+
+            BasicMatrixValue dim = (BasicMatrixValue) arg.get(2);
+			DoubleConstant constDouble;
+			DoubleConstant indices_num_matvalDouble;
+			if(dim.hasConstant()&& indices_num_matval.hasConstant()){
+				Constant dimConst = dim.getConstant();
+				Constant indices_num_matvalConst = indices_num_matval.getConstant();
+				if (dimConst instanceof DoubleConstant && indices_num_matvalConst instanceof DoubleConstant){
+					constDouble = (DoubleConstant)dimConst;
+					indices_num_matvalDouble = (DoubleConstant)indices_num_matvalConst;
+					if(matrix.hasShape()){
+						Shape shape = matrix.getShape();
+						int dimVal = constDouble.getValue().intValue();
+						int indicesVal = indices_num_matvalDouble.getValue().intValue();
+						if(shape.getDimensions().size() < dimVal) return null;
+						if(indicesVal == 1){
+							int numel = shape.getHowManyElements(0);
+							if(numel > -1) return Constant.get(numel);
+						}else if(shape.getDimensions().get(dimVal-1).hasIntValue()){
+							return Constant.get(shape.getDimensions().get(dimVal-1).getIntValue());
+						}
+					}
+				}
+			}
+		}
+    	return null;
+	}
 
     @Override
     public Constant caseFalse(Builtin builtin, Args<V> arg) {

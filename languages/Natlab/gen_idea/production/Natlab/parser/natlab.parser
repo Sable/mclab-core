@@ -1,0 +1,571 @@
+
+%goal program;
+
+//everything
+Program program =
+     //gather up any unclaimed comments
+     program_before_comments.p {: return annotateWithComments(p); :}
+  ;
+
+//everything except left-over comments
+Program program_before_comments = 
+     script.s {: return s; :}
+  |  function_seq.f {: return f; :}
+  |  class_def.c {: return c; :}
+  |  {: return new Script(); :}
+  |  otherTerminal {: return new Script(); :} //TODO-AC: eventually remove this
+  ;
+
+//script file: list of help comments followed by list of stmts
+//NB: must be non-empty
+Script script =
+     //NB: can't use a stmt_list here - it causes a bunch of warnings (not sure why)
+     stmt.stmts+ last_stmt.s {: return new Script(new List<HelpComment>(), stmts.add(s)); :}
+  |  last_stmt.s {: return new Script(new List<HelpComment>(), new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ stmt.stmts+ last_stmt.s {: return new Script(comments, stmts.add(s)); :}
+  |  help_comment.comments+ last_stmt.s {: return new Script(comments, new List<Stmt>().add(s)); :}
+  |  help_comment.comments+ last_help_comment.c {: return new Script(comments.add(c), new List<Stmt>()); :}
+  |  last_help_comment.c {: return new Script(new List<HelpComment>().add(c), new List<Stmt>()); :}
+  ;
+
+//function file: list of functions, separated by whitespace
+//NB: must be non-empty
+FunctionList function_seq =
+     function.functions+ {: return new FunctionList(functions); :}
+  ;
+  
+//function followed by whitespace - only used by function_seq (otherwise use function_body)
+Function function =
+     function_body.f LINE_TERMINATOR* {: return f; :}
+  ;
+
+//a function with nothing following the final END
+Function function_body =
+     //output params
+     FUNCTION output_params.out ASSIGN name.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return function(out, name, in, comments, body); :}
+     //no output params
+  |  FUNCTION name.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END
+         {: return function(null, name, in, comments, body); :}
+  ;
+
+//input parameter list for a function
+List input_params =
+     LPAREN RPAREN {: return new List<Name>(); :}
+  |  LPAREN param_list.l RPAREN {: return l; :}
+  ;
+
+//output parameter list for a function
+List output_params =
+     LSQUARE RSQUARE {: return new List<Name>(); :}
+  |  LSQUARE param_list.l RSQUARE {: return l; :}
+  |  name.p {: return new List<Name>().add(p); :}
+  ;
+
+//Non-empty, comma-separated list of parameters (note: no trailing comma)
+//shared by input and output parameters
+List param_list =
+     name.p {: return new List<Name>().add(p); :}
+  |  NOT    {: return new List<Name>().add(new Name("~")); :}
+  |  param_list.l COMMA name.p {: return l.add(p); :}
+  |  param_list.l COMMA NOT    {: return l.add(new Name("~")); :}  // TODO: Add new AST node type?
+  ;
+
+//used to mix stmts and nested functions in a containing function
+FunctionOrSignatureOrPropertyAccessOrStmt stmt_or_function =
+     stmt.s {: return s; :}
+     //NB: body since otherwise there is a conflict: function newline could be 
+     //  (function, empty stmt) or (function with newline)
+     //resolve as (function, empty stmt) because that's easier
+     //TODO-AC: eliminate spurious empty stmts?
+  |  function_body.f {: return f; :}
+  ;
+
+//a classdef file
+//NB: must be non-empty
+ClassDef class_def =
+	 CLASSDEF attributes.attr? IDENTIFIER.name stmt_separator_list help_comment.comments* class_body.body* END 
+	 	{: return classdef(attr, name, null, comments, body); :}
+  |  CLASSDEF attributes.attr? IDENTIFIER.name LT superclass_list.superclasses stmt_separator_list help_comment.comments* class_body.body* END 
+  		{: return classdef(attr, name, superclasses, comments, body); :}
+  ;
+  
+List attributes =
+	 LPAREN attribute_list.a RPAREN {: return a; :}
+  ;
+
+List attribute_list =
+	 attribute.a {: return new List<Attribute>().add(a); :}
+  |  attribute_list.l COMMA attribute.a {: return l.add(a); :}
+  ;
+    
+Attribute attribute =
+	 IDENTIFIER.key {: return new Attribute(key, new NameExpr(new Name("true"))); :}
+  |  NOT IDENTIFIER.key {: return new Attribute(key, new NameExpr(new Name("false"))); :}
+  |  IDENTIFIER.key ASSIGN expr.value {: return new Attribute(key, value); :}
+  ;
+   
+List superclass_list =
+	 IDENTIFIER.name {: return new List<SuperClass>().add(new SuperClass(name)); :}
+  |  superclass_list.l AND IDENTIFIER.name {: return l.add(new SuperClass(name)); :}
+  ;
+  
+ClassBody class_body =
+	 properties_block.p stmt_separator_opt_list {: return p; :}
+  |  methods_block.m stmt_separator_opt_list {: return m; :}
+  |  events_block.e stmt_separator_opt_list {: return e; :}
+  ;
+  
+Properties properties_block =
+	 PROPERTIES attributes.attr? stmt_separator_list properties_body.body* END
+	 {: return new Properties(nullToEmpty(attr), nullToEmpty(body)); :}
+  ;
+  
+Methods methods_block =
+	 METHODS attributes.attr? stmt_separator_list methods_body.body* END
+	 {: return methods(attr, body); :}
+  ;
+    
+ClassEvents events_block =
+	 EVENTS attributes.attr? stmt_separator_list events_body.body* END 
+	 {: return new ClassEvents(nullToEmpty(attr), body); :}
+  ;
+  
+Property properties_body =
+	 IDENTIFIER.name stmt_separator_list {: return new Property(name, new MatrixExpr()); :}
+  |  IDENTIFIER.name ASSIGN expr.value stmt_separator_list {: return new Property(name, value); :}
+  ;
+
+FunctionOrSignatureOrPropertyAccessOrStmt methods_body =
+	 function.f {: return f; :}
+  |  function_signature.s {: return s; :}
+  |  property_access.p {: return p; :}
+  ;
+  
+Signature function_signature =
+	 IDENTIFIER.name input_params.in? stmt_separator_list {: return new Signature(new List<Name>(), name, in); :}
+  |  output_params.out ASSIGN IDENTIFIER.name input_params.in? stmt_separator_list {: return new Signature(out, name, in); :}
+  ;
+  
+PropertyAccess property_access =
+     FUNCTION output_params.out ASSIGN IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END stmt_separator_list 
+         {: return propertyAccess(out, acc, name, in, comments, body); :}
+  |  FUNCTION IDENTIFIER.acc DOT IDENTIFIER.name input_params.in? stmt_separator help_comment.comments* stmt_or_function.body* END stmt_separator_list 
+         {: return propertyAccess(null, acc, name, in, comments, body); :}
+  ;
+  
+Event events_body =
+	 IDENTIFIER.name stmt_separator_list {: return new Event(name); :}
+  ;
+
+//usually help comments are followed by a newline, but the last one could be followed by EOF instead
+HelpComment last_help_comment =
+     help_comment.c {: return c; :}
+  |  help_comment_body.c {: return c; :}
+  ;
+
+//help comment with a newline
+HelpComment help_comment =
+     help_comment_body.c LINE_TERMINATOR {: return c; :}
+  ;
+
+//help comment without a newline
+HelpComment help_comment_body =
+     HELP_COMMENT.c {: return new OneLineHelpComment(c); :}
+  |  BRACKET_HELP_COMMENT.c {: return new MultiLineHelpComment(c); :}
+  ;
+
+//list of statements (each followed by a separator)
+//may be empty
+List stmt_seq =
+     stmt.stmts+ {: return stmts; :}
+  |  {: return new List<Stmt>(); :}
+  ;
+  
+//usually stmts are followed by separators, but the last one could be followed by EOF instead
+Stmt last_stmt =
+     stmt_body.s {: return s; :}
+  |  stmt.s {: return s; :}
+  ;
+
+//stmt followed by separator
+Stmt stmt =
+     stmt_body.s stmt_separator.sep {: return sep.annotateStmt(s); :}
+     //annotate comments to empty statements - give location information via the separator
+  |  stmt_separator.sep {: return annotateEmptyStmtWithComments((EmptyStmt)sep.annotateStmt(new EmptyStmt()),sep); :}
+  ;
+
+//stmt not followed by separator
+//production just exists to attach comments to the real stmt bodies in stmt_body_before_comments
+Stmt stmt_body =
+     stmt_body_before_comments.s {: return annotateWithComments(s); :}
+  ;
+
+//stmt not followed by a separator and not having attached comments
+Stmt stmt_body_before_comments =
+     expr.e {: return new ExprStmt(e); :}
+  |  expr.lhs ASSIGN expr.rhs {: return new AssignStmt(lhs, rhs); :}
+  |  GLOBAL  name.names+ {: return new GlobalStmt(names); :}
+  |  PERSISTENT name.names+ {: return new PersistentStmt(names); :}
+  |  SHELL_COMMAND.c {: return new ShellCommandStmt(c); :}
+  |  TRY stmt_separator stmt_seq.tl END {: return new TryStmt(tl, new List()); :}
+  |  TRY stmt_separator stmt_seq.tl CATCH stmt_separator stmt_seq.cl END {: return new TryStmt(tl, cl); :}
+  |  switch_statement.s {: return s; :}
+  |  if_statement.s {: return s; :}
+  |  BREAK    {: return new BreakStmt(); :}
+  |  CONTINUE {: return new ContinueStmt(); :}
+  |  RETURN   {: return new ReturnStmt(); :}
+  |  WHILE expr.e stmt_separator stmt_seq.l END {: return new WhileStmt(e, l); :}
+  |  FOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l, false); :}
+  |  PARFOR for_assign.a stmt_separator stmt_seq.l END {: return new ForStmt(a, l, true); :}
+  ;
+
+SwitchStmt switch_statement = 
+	 SWITCH expr.e stmt_separator END
+        {: return new SwitchStmt(e, new List<SwitchCaseBlock>(), new Opt<DefaultCaseBlock>()); :}
+  |  SWITCH expr.e stmt_separator default_case.d END
+        {: return new SwitchStmt(e, new List<SwitchCaseBlock>(), new Opt<DefaultCaseBlock>(d)); :}
+  |  SWITCH expr.e stmt_separator switch_case.s+ END
+        {: return new SwitchStmt(e, s, new Opt<DefaultCaseBlock>()); :}
+  |  SWITCH expr.e stmt_separator switch_case.s+ default_case.d END
+        {: return new SwitchStmt(e, s, new Opt<DefaultCaseBlock>(d)); :}
+  ;
+
+SwitchCaseBlock switch_case	= 
+     CASE expr.e stmt_separator stmt_seq.l {: return new SwitchCaseBlock(e, l); :}
+  ;
+DefaultCaseBlock default_case = 
+     OTHERWISE stmt_separator stmt_seq.l  {: return new DefaultCaseBlock(l); :}
+  ;
+  
+IfStmt if_statement = 
+     if_clause.i END
+        {: return new IfStmt(new List<IfBlock>().add(i), new Opt<ElseBlock>()); :}
+  |  if_clause.i else_clause.els END
+        {: return new IfStmt(new List<IfBlock>().add(i), new Opt<ElseBlock>(els)); :}
+  |  if_clause.i else_if_clause.elseif+ END
+        {:
+            List<IfBlock> ifBlocks = elseif;
+            ifBlocks.insertChild(i, 0);
+            return new IfStmt(ifBlocks, new Opt<ElseBlock>());
+        :}
+  |  if_clause.i else_if_clause.elseif+ else_clause.els END
+        {:
+            List<IfBlock> ifBlocks = elseif;
+            ifBlocks.insertChild(i, 0);
+            return new IfStmt(ifBlocks, new Opt<ElseBlock>(els));
+        :}
+  ;
+
+IfBlock if_clause =
+     IF expr.e stmt_separator stmt_seq.l {: return new IfBlock(e, l); :}
+  ;
+
+IfBlock else_if_clause = 
+     ELSEIF expr.e stmt_separator stmt_seq.l  {: return new IfBlock(e, l); :}
+  ;
+  
+ElseBlock else_clause = 
+     ELSE stmt_separator stmt_seq.l {: return new ElseBlock(l); :}
+  ;
+
+BooleanFakeSymbol stmt_separator =
+     LINE_TERMINATOR {: return new BooleanFakeSymbol(false); :}
+  |  SEMICOLON {: return new BooleanFakeSymbol(true); :}
+  |  SEMICOLON_LINE_TERMINATOR {: return new BooleanFakeSymbol(true); :}
+  |  COMMA {: return new BooleanFakeSymbol(false); :}
+  |  COMMA_LINE_TERMINATOR {: return new BooleanFakeSymbol(false); :}
+  ;
+
+List stmt_separator_opt_list =
+    {: return new List(); :}
+  | stmt_separator_list.n {: return n; :}
+  ;
+List stmt_separator_list =
+    stmt_separator.n {: return new List(); :}
+  | stmt_separator_list.l stmt_separator.n {: return l; :}
+  ;
+
+//assingment appearing in a for loop (i.e. optionally surrounded by parens)
+AssignStmt for_assign =
+     name.lhs ASSIGN expr.rhs {: return new AssignStmt(new NameExpr(lhs), rhs); :}
+  |  LPAREN name.lhs ASSIGN expr.rhs RPAREN {: return new AssignStmt(new NameExpr(lhs), rhs); :}
+  ;
+
+Name name =
+     IDENTIFIER.id {: return new Name(id); :}
+  ;
+
+//precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
+Expr expr =
+     logic_expr_shortor.l {: return l; :}
+  |  AT input_params.params expr.body {: return new LambdaExpr(params, body); :}
+  ;
+
+Expr logic_expr_shortor =
+     logic_expr_shortand.e {: return e; :}
+  |  logic_expr_shortor.e1 SHORTOR logic_expr_shortand.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
+  ;
+
+Expr logic_expr_shortand =
+     logic_expr_or.e {: return e; :}
+  |  logic_expr_shortand.e1 SHORTAND logic_expr_or.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
+  ;
+
+Expr logic_expr_or =
+     logic_expr_and.e {: return e; :}
+  |  logic_expr_or.e1 OR logic_expr_and.e2 {: return new OrExpr(e1, e2); :}
+  ;
+
+Expr logic_expr_and =
+     logic_expr_eq_ne.e {: return e; :}
+  |  logic_expr_and.e1 AND logic_expr_eq_ne.e2 {: return new AndExpr(e1, e2); :}
+  ;
+
+Expr logic_expr_eq_ne =
+     logic_expr_lt_gt_le_ge.e {: return e; :}
+  |  logic_expr_eq_ne.e1 EQ logic_expr_lt_gt_le_ge.e2 {: return new EQExpr(e1, e2); :}
+  |  logic_expr_eq_ne.e1 NE logic_expr_lt_gt_le_ge.e2 {: return new NEExpr(e1, e2); :}
+  ;
+
+Expr logic_expr_lt_gt_le_ge =
+     colon_expr.e {: return e; :}
+  |  logic_expr_lt_gt_le_ge.e1 LT colon_expr.e2 {: return new LTExpr(e1, e2); :}
+  |  logic_expr_lt_gt_le_ge.e1 GT colon_expr.e2 {: return new GTExpr(e1, e2); :}
+  |  logic_expr_lt_gt_le_ge.e1 LE colon_expr.e2 {: return new LEExpr(e1, e2); :}
+  |  logic_expr_lt_gt_le_ge.e1 GE colon_expr.e2 {: return new GEExpr(e1, e2); :}
+  ;
+
+Expr colon_expr =
+     binary_expr_plus_minus.e {: return e; :}
+  |  binary_expr_plus_minus.e1 COLON binary_expr_plus_minus.e3 {: return new RangeExpr(e1, new Opt(), e3); :}
+  |  binary_expr_plus_minus.e1 COLON binary_expr_plus_minus.e2 COLON binary_expr_plus_minus.e3 {: return new RangeExpr(e1, new Opt(e2), e3); :}
+  ;
+
+Expr binary_expr_plus_minus =
+     binary_expr_times_div.e {: return e; :}
+  |  binary_expr_plus_minus.e1 PLUS binary_expr_times_div.e2    {: return new PlusExpr(e1, e2); :}
+  |  binary_expr_plus_minus.e1 MINUS binary_expr_times_div.e2   {: return new MinusExpr(e1, e2); :}
+  ;
+
+Expr binary_expr_times_div =
+     prefix_expr.e {: return e; :}
+  |  binary_expr_times_div.e1 MTIMES prefix_expr.e2  {: return new MTimesExpr(e1, e2); :}
+  |  binary_expr_times_div.e1 ETIMES prefix_expr.e2  {: return new ETimesExpr(e1, e2); :}
+  |  binary_expr_times_div.e1 MDIV prefix_expr.e2    {: return new MDivExpr(e1, e2); :}
+  |  binary_expr_times_div.e1 EDIV prefix_expr.e2    {: return new EDivExpr(e1, e2); :}
+  |  binary_expr_times_div.e1 MLDIV prefix_expr.e2   {: return new MLDivExpr(e1, e2); :}
+  |  binary_expr_times_div.e1 ELDIV prefix_expr.e2   {: return new ELDivExpr(e1, e2); :}
+  ;
+
+Expr prefix_expr =
+     pow_expr.e {: return e; :}
+  |  NOT prefix_expr.e {: return new NotExpr(e); :}
+  |  PLUS prefix_expr.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_expr.e {: return new UMinusExpr(e); :}
+  ;
+
+Expr pow_expr =
+     postfix_expr.e {: return e; :}
+  |  pow_expr.e1 MPOW prefix_exp_expr.e2    {: return new MPowExpr(e1, e2); :}
+  |  pow_expr.e1 EPOW prefix_exp_expr.e2    {: return new EPowExpr(e1, e2); :}
+  ;
+
+Expr prefix_exp_expr =
+     postfix_expr.e {: return e; :}
+  |  NOT prefix_exp_expr.e {: return new NotExpr(e); :}
+  |  PLUS prefix_exp_expr.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_exp_expr.e {: return new UMinusExpr(e); :}
+  ;
+
+Expr postfix_expr =
+     primary_expr.e {: return e; :}
+  |  postfix_expr.e ARRAYTRANSPOSE {: return new ArrayTransposeExpr(e); :}
+  |  postfix_expr.e MTRANSPOSE {: return new MTransposeExpr(e); :}
+  ;
+
+Expr primary_expr =
+     literal.l {: return l; :}
+  |  LPAREN expr.e RPAREN {: return e; :}
+  |  matrix.m {: return m; :}
+  |  cell_array.c {: return c; :}
+  |  access.a {: return a; :}
+  |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  ;
+
+Expr access =
+     cell_access.c {: return c; :}
+  |  cell_access.c LPAREN RPAREN {: return new ParameterizedExpr(c, new List<Expr>()); :}
+  |  cell_access.c LPAREN arg_list.l RPAREN {: return new ParameterizedExpr(c, l); :}
+  ;
+
+Expr cell_access =
+     name.n {: return new NameExpr(n); :}
+  |  name.f AT name.c {: return new SuperClassMethodExpr(f, c); :}
+  |  cell_access.v LCURLY arg_list.l RCURLY {: return new CellIndexExpr(v, l); :}
+  |  access.v DOT name.n {: return new DotExpr(v, n); :}
+  ;
+
+LiteralExpr literal =
+     INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i)); :}
+  |  IM_INT_NUMBER.i {: return new IntLiteralExpr(new DecIntNumericLiteralValue(i, true)); :}
+  |  FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"))); :}
+  |  IM_FP_NUMBER.f {: return new FPLiteralExpr(new FPNumericLiteralValue(f.replaceAll("[Dd]", "e"), true)); :}
+  |  STRING.s {: return new StringLiteralExpr(s); :}
+  ;
+
+
+MatrixExpr matrix =
+     LSQUARE optional_row_list.l RSQUARE {: return new MatrixExpr(l); :}
+  ;
+
+cell_array =
+     LCURLY optional_row_list.l RCURLY {: return new CellArrayExpr(l); :}
+  ;
+
+List optional_row_list =
+     {: return new List<Row>(); :}
+  |  row_separator {: return new List<Row>(); :}
+  |  row_list.l {: return l; :}
+  |  row_list.l row_separator {: return l; :}
+  ;
+
+List row_list =
+     row.r {: return new List<Row>().add(r); :}
+  |  row_list.l row_separator row.r {: return l.add(r); :}
+  ;
+
+Row row =
+     element_list.l COMMA? {: return new Row(l); :}
+  ;
+
+row_separator =
+     LINE_TERMINATOR
+  |  SEMICOLON
+  |  SEMICOLON_LINE_TERMINATOR
+  |  COMMA_LINE_TERMINATOR 
+  ;
+
+List element_list =
+     element.e {: return new List<Expr>().add(e); :}
+  |  element_list.l COMMA element.e {: return l.add(e); :}
+  ;
+  
+Expr element =
+     expr.e  {: return e; :}
+  |  NOT     {: return new NameExpr(new Name("~")); :}
+  ;
+
+List arg_list =
+     arg.a {: return new List<Expr>().add(a); :}
+  |  arg_list.l COMMA arg.a {: return l.add(a); :}
+  ;
+
+//precedence from: http://www.mathworks.com/access/helpdesk/help/techdoc/matlab_prog/f0-40063.html
+//just like expr except for COLON at top level and END at base level
+Expr arg =
+     logic_arg_shortor.l {: return l; :}
+  |  AT input_params.params arg.body {: return new LambdaExpr(params, body); :} //TODO-AC: expr instead of arg?
+  |  COLON.c {: return new ColonExpr(); :}
+  ;
+
+Expr logic_arg_shortor =
+     logic_arg_shortand.e {: return e; :}
+  |  logic_arg_shortor.e1 SHORTOR logic_arg_shortand.e2 {: return new ShortCircuitOrExpr(e1, e2); :}
+  ;
+
+Expr logic_arg_shortand =
+     logic_arg_or.e {: return e; :}
+  |  logic_arg_shortand.e1 SHORTAND logic_arg_or.e2 {: return new ShortCircuitAndExpr(e1, e2); :}
+  ;
+
+Expr logic_arg_or =
+     logic_arg_and.e {: return e; :}
+  |  logic_arg_or.e1 OR logic_arg_and.e2 {: return new OrExpr(e1, e2); :}
+  ;
+
+Expr logic_arg_and =
+     logic_arg_eq_ne.e {: return e; :}
+  |  logic_arg_and.e1 AND logic_arg_eq_ne.e2 {: return new AndExpr(e1, e2); :}
+  ;
+
+Expr logic_arg_eq_ne =
+     logic_arg_lt_gt_le_ge.e {: return e; :}
+  |  logic_arg_eq_ne.e1 EQ logic_arg_lt_gt_le_ge.e2 {: return new EQExpr(e1, e2); :}
+  |  logic_arg_eq_ne.e1 NE logic_arg_lt_gt_le_ge.e2 {: return new NEExpr(e1, e2); :}
+  ;
+
+Expr logic_arg_lt_gt_le_ge =
+     colon_arg.e {: return e; :}
+  |  logic_arg_lt_gt_le_ge.e1 LT colon_arg.e2 {: return new LTExpr(e1, e2); :}
+  |  logic_arg_lt_gt_le_ge.e1 GT colon_arg.e2 {: return new GTExpr(e1, e2); :}
+  |  logic_arg_lt_gt_le_ge.e1 LE colon_arg.e2 {: return new LEExpr(e1, e2); :}
+  |  logic_arg_lt_gt_le_ge.e1 GE colon_arg.e2 {: return new GEExpr(e1, e2); :}
+  ;
+
+Expr colon_arg =
+     binary_arg_plus_minus.e {: return e; :}
+  |  binary_arg_plus_minus.e1 COLON binary_arg_plus_minus.e3 {: return new RangeExpr(e1, new Opt(), e3); :}
+  |  binary_arg_plus_minus.e1 COLON binary_arg_plus_minus.e2 COLON binary_arg_plus_minus.e3 {: return new RangeExpr(e1, new Opt(e2), e3); :}
+  ;
+
+Expr binary_arg_plus_minus =
+     binary_arg_times_div.e {: return e; :}
+  |  binary_arg_plus_minus.e1 PLUS binary_arg_times_div.e2    {: return new PlusExpr(e1, e2); :}
+  |  binary_arg_plus_minus.e1 MINUS binary_arg_times_div.e2   {: return new MinusExpr(e1, e2); :}
+  ;
+
+Expr binary_arg_times_div =
+     prefix_arg.e {: return e; :}
+  |  binary_arg_times_div.e1 MTIMES prefix_arg.e2  {: return new MTimesExpr(e1, e2); :}
+  |  binary_arg_times_div.e1 ETIMES prefix_arg.e2  {: return new ETimesExpr(e1, e2); :}
+  |  binary_arg_times_div.e1 MDIV prefix_arg.e2    {: return new MDivExpr(e1, e2); :}
+  |  binary_arg_times_div.e1 EDIV prefix_arg.e2    {: return new EDivExpr(e1, e2); :}
+  |  binary_arg_times_div.e1 MLDIV prefix_arg.e2   {: return new MLDivExpr(e1, e2); :}
+  |  binary_arg_times_div.e1 ELDIV prefix_arg.e2   {: return new ELDivExpr(e1, e2); :}
+  ;
+
+Expr prefix_arg =
+     pow_arg.e {: return e; :}
+  |  NOT prefix_arg.e {: return new NotExpr(e); :}
+  |  PLUS prefix_arg.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_arg.e {: return new UMinusExpr(e); :}
+  ;
+
+Expr pow_arg =
+     postfix_arg.e {: return e; :}
+  |  pow_arg.e1 MPOW prefix_exp_arg.e2    {: return new MPowExpr(e1, e2); :}
+  |  pow_arg.e1 EPOW prefix_exp_arg.e2    {: return new EPowExpr(e1, e2); :}
+  ;
+
+Expr prefix_exp_arg =
+     postfix_arg.e {: return e; :}
+  |  NOT prefix_exp_arg.e {: return new NotExpr(e); :}
+  |  PLUS prefix_exp_arg.e {: return new UPlusExpr(e); :}
+  |  MINUS prefix_exp_arg.e {: return new UMinusExpr(e); :}
+  ;
+
+Expr postfix_arg =
+     primary_arg.e {: return e; :}
+  |  postfix_arg.e ARRAYTRANSPOSE {: return new ArrayTransposeExpr(e); :}
+  |  postfix_arg.e MTRANSPOSE {: return new MTransposeExpr(e); :}
+  ;
+
+Expr primary_arg =
+     literal.l {: return l; :}
+  |  LPAREN arg.a RPAREN {: return a; :}
+  |  matrix.m {: return m; :}
+  |  cell_array.c {: return c; :}
+  |  access.a {: return a; :}
+  |  AT name.name {: return new FunctionHandleExpr(name); :} //TODO-AC: allow qualified name?
+  |  END {: return new EndExpr(); :}
+  ;
+
+//terminals that we have to refer to in the grammar (so that beaver doesn't get rid of them)
+//but which aren't used in other productions
+otherTerminal =
+     PARFOR
+  |  COMMENT
+  |  ELLIPSIS_COMMENT
+  |  BRACKET_COMMENT
+  ;

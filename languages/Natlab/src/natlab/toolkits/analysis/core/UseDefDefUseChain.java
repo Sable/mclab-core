@@ -1,5 +1,6 @@
 package natlab.toolkits.analysis.core;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class UseDefDefUseChain {
   
   private ImmutableSetMultimap<Stmt, Name> defs;
   private ImmutableSetMultimap<Stmt, Name> uses;
-  
+
   /**
    * Given an occurrence of a variable, return all of the reaching definitions.
    */

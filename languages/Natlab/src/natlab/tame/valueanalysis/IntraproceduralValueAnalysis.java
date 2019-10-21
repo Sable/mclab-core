@@ -184,7 +184,11 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     }
     
     public void caseIRCommentStmt(TIRCommentStmt node) {}
-    
+
+    /**
+     * (Modified dherre3) Added ShapePropagation equation for loop variable in for stmt.
+     * @param assign
+     */
     @SuppressWarnings("unchecked")
     @Override
     public void caseLoopVar(AssignStmt assign) {
@@ -192,9 +196,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         TIRForStmt node = (TIRForStmt)assign.getParent();
         ValueFlowMap<V> flow = getCurrentInSet();
         LinkedList<Res<V>> results = new LinkedList<Res<V>>();
-        //set the loop var
-        //TODO - do we have to check whether colon is overloaded? - some initial checks say no, it cannot be overloaded
-        //TODO - should we just call builtin colon propagator?
         if (node.hasIncr()){ //there's an inc value
             for (LinkedList<V> list : cross(flow,
                     node.getLowerName(),node.getIncName(),node.getUpperName())){
@@ -206,7 +207,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
                     node.getLowerName(),node.getUpperName())){
                 results.add(Res.newInstance(
                 		factory.forRange(list.getFirst(),list.getLast(),null)));
-                if (Debug) System.out.println("inside intraprocedural value analysis loop case else, the results are "+results);
             }
         }
         //put results
@@ -248,7 +248,6 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         if (Debug) System.out.println("case array get: "+node.getPrettyPrinted());
         ValueFlowMap<V> flow = getCurrentInSet(); //note copied!
         Callsite<IntraproceduralValueAnalysis<V>,Args<V>,Res<V>> callsite = null; //used if there is a call in this stmt
-        //if (Debug) System.out.println(flow);
         ValueSet<V> array = flow.get(node.getArrayName().getID());
         if (array == null) throw new UnsupportedOperationException("attempting to access unknown array "+node.getArrayName().getID()+" in\n"+node.getPrettyPrinted()+"\n with flow "+flow);
         LinkedList<Res<V>> results = new LinkedList<Res<V>>();
@@ -612,12 +611,12 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     		numOfOutputVariables = ((TIRAbstractAssignToListStmt)callsite.getASTNode()).getNumTargets();
     		//XU added here, to pass number of output variables to the equation propagator/analysis
     	}
-    	
+
     	LinkedList<Res<V>> results = new LinkedList<Res<V>>();
         if (Debug) System.out.println("calling function "+function+" with\n"+cross(flow,args,partialArgs));
         for (LinkedList<V> argumentList : cross(flow,args,partialArgs)){
+            // cross returns all possible combinations of arguments and shapes.
         	FunctionReference function = functionReference;
-        	
         	//check overloading
         	if (checkOverloading && argumentList.size() > 0){
         		//find the dominant argument
@@ -641,35 +640,44 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         				"call to function "+functionName+" in function call "+this.node.getCall()+" cannot be resolved. trace: \n"
         				+this.node.getCallString());
         	}
-        	
+
         	//actually call
-            //System.out.println("doFunctionCall result "+res);
         	if (function.isBuiltin()) {
-            	if (functionName.equals("horzcat") || functionName.equals("vertcat")) {
-            		LinkedList<V> hookList = new LinkedList<V>();
-                	for (Name arg : args.asNameList()) {
-                		hookList.add(flow.get(arg.getID()).getSingleton());
-                	}
-            		hookMap.put(targets.getName(0).getID(), hookList);
+        	    // Ideally we should have a powerful enough shape propagator, which uses the
+                // value propagator for calls such as the array constructors.
+            	if ((functionName.equals("horzcat") || functionName.equals("vertcat"))&&targets.size() == 1) {
+                    LinkedList<V> hookList = new LinkedList<V>();
+                    for (Name arg : args.asNameList()) {
+                        hookList.add(flow.get(arg.getID()).getSingleton());
+                    }
+                    hookMap.put(targets.getName(0).getID(), hookList);
             	}
             	Args<V> argsObj;
-            	if ((functionName.equals("ones") || functionName.equals("zeros") || functionName.equals("rand"))
+                Builtin builtinInstance = Builtin.getInstance(functionName);
+            	if (( builtinInstance instanceof Builtin.AbstractNumericalByShapeAndTypeMatrixCreation
+                        || builtinInstance instanceof Builtin.Rand || builtinInstance instanceof Builtin.Randn)
             			&& args.size()==1 && hookMap.containsKey(args.asNameList().get(0).getID())) {
-            		argsObj = Args.newInstance(numOfOutputVariables
+                argsObj = Args.newInstance(numOfOutputVariables
             				, hookMap.get(args.asNameList().get(0).getID()));
-            	}
+            	}else if(builtinInstance instanceof Builtin.Randi && args.size() == 2
+                        && hookMap.containsKey(args.asNameList().get(1).getID()) ){
+                    LinkedList<V> val = copyValueList(hookMap.get(args.asNameList().get(1).getID()));
+                    val.addFirst(argumentList.get(0));
+            	    argsObj = Args.newInstance(numOfOutputVariables,  val);
+                }
             	else {
             		argsObj = Args.newInstance(numOfOutputVariables,argumentList);
             	}
-                //spcial cases for some known functions
-            	callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
+                //special cases for some known functions
+                callsite.addBuiltinCall(new Call<Args<V>>(function, argsObj));
+
                 if (function.getName().equals("nargin") && argsObj.size() == 0){
                 	// changed by XU @ 6:41pm March 9th 2013, TODO unchecked!
                     results.add(Res.newInstance(factory.newMatrixValue(null, argMap.size())));
                 } else {
-                	if (Debug) System.out.println("calling propagator with argument "+argsObj);
-                	results.add(valuePropagator.call(function.getName(), argsObj));
+                    if (Debug) System.out.println("calling propagator with argument "+argsObj);
                 }
+                results.add(valuePropagator.call(function.getName(), argsObj));
             }else{
                 //simplify args
                 ArrayList<V> newArgumentList = new ArrayList<V>(argumentList);
@@ -714,7 +722,14 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
         //FIXME
         return Res.newInstance(results);
     }
-    
+
+    private LinkedList<V> copyValueList(LinkedList<V> vs) {
+        LinkedList<V> copy =  new LinkedList<>();
+        copy.addAll(vs);
+        return copy;
+    }
+
+
 
     /**
      * assigns the given collection of values, to the targets represented
@@ -731,8 +746,8 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
     
     /**
      * assigns the given collection of values, to the targets represented
-     * by the comma separated list. Returns a new flowmap which is a copy
-     * of old one, except for the newly assigned valeus.
+     * by the comma separated list. Returns a new flow-map which is a copy
+     * of old one, except for the newly assigned values.
      * 
      * all assignments should go through assign calls
      * 
@@ -783,9 +798,12 @@ implements FunctionAnalysis<Args<V>, Res<V>>{
      */
     private boolean isVarAssigned(ValueFlowMap<V> flow,String varName){
         return (flow.containsKey(varName) && (flow.get(varName).size > 0));
-    }    
-    
-    
+    }
+
+    /**
+     * Copy LinkedList of values
+     */
+
     /**
      * checks whether the current flow set is not viable. If it isn't, associate
      * nonviable in/out sets, and return true. Thus, every statement case should
