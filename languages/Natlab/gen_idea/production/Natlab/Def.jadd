@@ -1,8 +1,0 @@
-import natlab.toolkits.analysis.core.Def;
-
-aspect Def
-{
-  AssignStmt implements Def;
-  GlobalStmt implements Def;
-  Name implements Def;
-}

@@ -1,4 +1,0 @@
-%header {:
-	 package natlab;
-	 import ast.*;
-:};
