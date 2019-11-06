@@ -5522,6 +5522,15 @@ public abstract class Builtin {
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractScalarLogicalResultVersatileQuery(this,arg);
         }
+        private SPNode shapePropInfo = null;
+        public SPNode getShapePropagationInfo(){
+            //set shapePropInfo if not defined
+            if (shapePropInfo == null){
+                // M,$ -> $
+                shapePropInfo = ShapePropTool.parse("M|$ -> $");
+            }
+            return shapePropInfo;
+        }
         
     }
     public static abstract class AbstractClassQuery extends AbstractScalarLogicalResultVersatileQuery  {
@@ -5705,7 +5714,6 @@ public abstract class Builtin {
         public <Arg,Ret> Ret visit(BuiltinVisitor<Arg,Ret> visitor, Arg arg){
             return visitor.caseAbstractScalarLogicalShapeQuery(this,arg);
         }
-        
     }
     public static class Isempty extends AbstractScalarLogicalShapeQuery  {
         //returns the singleton instance of this class
